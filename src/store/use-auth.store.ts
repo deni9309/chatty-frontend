@@ -30,15 +30,18 @@ export const useAuthStore = create<AuthState>()(
       setAuthUser: (user) => set({ authUser: user }),
 
       checkAuth: async () => {
-        set({ isLoggingIn: true })
+        set({ isCheckingAuth: true })
         try {
           const token = get().getToken()
-          if (!token) throw new Error('No token found')
+          if (!token) {
+            set({ isCheckingAuth: false })
+            return
+          }
 
-          const res = await api.get('/auth/me')
+          const res = await api.get<AuthUser>('/auth/me')
           set({ authUser: res.data })
         } catch (error) {
-          console.log(error)
+          console.log('Error checking auth', error)
           get().clearToken()
           set({ authUser: null })
         } finally {

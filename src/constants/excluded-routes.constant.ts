@@ -1,3 +1,3 @@
-const excludedRoutes = ['/login', '/register', '/error']
+const excludedRoutes = ['/login', '/register', '/error', '/settings']
 
 export default excludedRoutes

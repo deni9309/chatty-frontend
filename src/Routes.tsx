@@ -11,53 +11,44 @@ import ErrorPage from './pages/shared/error-page'
 import SettingsPage from './pages/settings-page'
 import AuthGuard from './guards/auth-guard'
 import ProfilePage from './pages/profile-page'
+import GuestGuard from './guards/guest-guard'
 
 const router = createBrowserRouter([
   {
-    element: <MainLayout />,
+    element: (
+      <AuthGuard>
+        <MainLayout />
+      </AuthGuard>
+    ),
     children: [
-      {
-        path: '/',
-        element: (
-          <AuthGuard>
-            <HomePage />
-          </AuthGuard>
-        ),
-      },
-      {
-        path: '/home',
-        element: (
-          <AuthGuard>
-            <HomePage />
-          </AuthGuard>
-        ),
-      },
-      {
-        path: '/profile',
-        element: (
-          <AuthGuard>
-            <ProfilePage />
-          </AuthGuard>
-        ),
-      },
-      {
-        path: '/settings',
-        element: (
-          <AuthGuard>
-            <SettingsPage />
-          </AuthGuard>
-        ),
-      },
+      { path: '/', element: <HomePage /> },
+      { path: '/home', element: <HomePage /> },
+      { path: '/profile', element: <ProfilePage /> },
       // { path: '/chats/:_id', element: <ChatDetails /> },
     ],
   },
   {
     element: <AuthLayout />,
     children: [
-      { path: '/register', element: <RegisterPage /> },
-      { path: '/login', element: <LoginPage /> },
+      {
+        path: '/register',
+        element: (
+          <GuestGuard>
+            <RegisterPage />
+          </GuestGuard>
+        ),
+      },
+      {
+        path: '/login',
+        element: (
+          <GuestGuard>
+            <LoginPage />
+          </GuestGuard>
+        ),
+      },
     ],
   },
+  { path: '/settings', element: <SettingsPage /> },
   { path: '/error', element: <ErrorPage /> },
 ])
 
