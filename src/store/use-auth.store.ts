@@ -4,6 +4,7 @@ import { AuthUser } from '../types/authUser'
 import { AUTH_STORAGE, TOKEN } from '../constants/app-constants'
 import api from '../lib/axios'
 import { RegisterFormType } from '../schemas/register.schema'
+import { LoginFormType } from '../schemas/login.schema'
 
 interface AuthState {
   authUser: AuthUser | null
@@ -15,6 +16,7 @@ interface AuthState {
   checkAuth: () => Promise<void>
   setCheckingAuth: (value: boolean) => void
   register: (data: RegisterFormType) => Promise<void>
+  login: (data: LoginFormType) => Promise<void>
   setToken: (token: string) => void
   getToken: () => string | null
   clearToken: () => void
@@ -65,6 +67,21 @@ export const useAuthStore = create<AuthState>()(
           throw error
         } finally {
           set({ isSigningUp: false })
+        }
+      },
+
+      login: async (data) => {
+        set({ isLoggingIn: true })
+        try {
+          const res = await api.post<AuthUser & { token: string }>('/auth/login', data)
+          const { token, ...authUser } = res.data
+          set({ authUser })
+          get().setToken(token)
+        } catch (error) {
+          console.log('Error logging in user', error)
+          throw error
+        } finally {
+          set({ isLoggingIn: false })
         }
       },
 

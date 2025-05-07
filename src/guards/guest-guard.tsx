@@ -1,14 +1,18 @@
-import { ReactNode } from 'react'
+import { ReactNode, useEffect } from 'react'
 import { useAuthStore } from '../store/use-auth.store'
 import { Navigate, useLocation } from 'react-router-dom'
-import { Loader } from 'lucide-react'
+import Loader from '../components/shared/loader'
 
 interface GuestGuardProps {
   children: ReactNode
 }
 export default function GuestGuard({ children }: GuestGuardProps) {
-  const { authUser: user, isCheckingAuth } = useAuthStore()
+  const { authUser: user, isCheckingAuth, checkAuth } = useAuthStore()
   const location = useLocation()
+
+  useEffect(() => {
+    checkAuth()
+  }, [checkAuth])
 
   if (isCheckingAuth) {
     return (

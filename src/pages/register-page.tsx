@@ -2,7 +2,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { AtSign, KeyRound, LucideUser } from 'lucide-react'
 
 import { RegisterFormType, RegisterSchema } from '../schemas/register.schema'
@@ -38,7 +38,7 @@ const RegisterPage = () => {
     <div className="flex flex-col w-full items-center mx-auto max-sm:mx-0.5">
       <div className="text-center my-8">
         <ChattyLogo className="text-primary size-10" />
-        <h1>Create an Account</h1>
+        <h1>Create an account</h1>
         <p>Get started with your free Chatty account</p>
       </div>
 
@@ -64,6 +64,13 @@ const RegisterPage = () => {
           Register
         </button>
       </form>
+
+      <div className="flex w-full max-w-md text-sm gap-1 my-2">
+        <span>Already have an account?</span>
+        <Link className="link link-primary " to="/login">
+          Login
+        </Link>
+      </div>
     </div>
   )
 }

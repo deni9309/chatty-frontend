@@ -42,7 +42,7 @@ const FormInputText = <T extends FieldValues>({
       render={({ field: { onChange, value }, fieldState: { error } }) => (
         <div className={cn('form-control', classNames ?? '')}>
           <label className="input input-bordered flex items-center gap-2">
-            {Icon && <Icon className="size-5 text-gray-500" />}
+            {Icon && <Icon className="size-5 text-base-content/40" />}
             <input
               type={
                 name === ('password' as keyof Path<T>)
@@ -67,9 +67,12 @@ const FormInputText = <T extends FieldValues>({
                 onMouseUp={onMouseUpPassword}
               >
                 {showPassword ? (
-                  <Eye className="size-5 text-gray-500" aria-label="Password is visible" />
+                  <Eye className="size-5 text-base-content/40" aria-label="Password is visible" />
                 ) : (
-                  <EyeClosed className="size-5  text-gray-500" aria-label="Password is hidden" />
+                  <EyeClosed
+                    className="size-5 text-base-content/40"
+                    aria-label="Password is hidden"
+                  />
                 )}
               </button>
             )}
