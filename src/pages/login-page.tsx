@@ -4,13 +4,14 @@ import { useForm } from 'react-hook-form'
 import * as z from 'zod'
 import { AtSign, KeyRound } from 'lucide-react'
 import { zodResolver } from '@hookform/resolvers/zod'
+import toast from 'react-hot-toast'
+import { Link } from 'react-router-dom'
 
 import { useAuthStore } from '../store/use-auth.store'
 import { LoginFormType, LoginSchema } from '../schemas/login.schema'
 import { loginFormDefaultValues } from '../constants/form-default-values'
 import ChattyLogo from '../components/shared/chatty-logo-component'
 import FormInputText from '../components/shared/form-input-text'
-import { Link } from 'react-router-dom'
 
 const LoginPage = () => {
   const { isLoggingIn, login } = useAuthStore()
@@ -25,6 +26,7 @@ const LoginPage = () => {
   async function onSubmit(values: LoginFormType) {
     try {
       await login(values)
+      toast.success('Welcome back!')
       navigate('/')
     } catch (error) {
       if (error instanceof Error) {

@@ -4,6 +4,7 @@ import * as z from 'zod'
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { AtSign, KeyRound, LucideUser } from 'lucide-react'
+import toast from 'react-hot-toast'
 
 import { RegisterFormType, RegisterSchema } from '../schemas/register.schema'
 import { registerFormDefaultValues } from '../constants/form-default-values'
@@ -24,6 +25,7 @@ const RegisterPage = () => {
   async function onSubmit(values: RegisterFormType) {
     try {
       await register(values)
+      toast.success('Welcome to Chatty!')
       navigate('/')
     } catch (error) {
       if (error instanceof Error) {

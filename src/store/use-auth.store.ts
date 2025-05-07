@@ -10,6 +10,7 @@ interface AuthState {
   authUser: AuthUser | null
   isLoggingIn: boolean
   isSigningUp: boolean
+  isLoggingOut: boolean
   isUpdatingProfile: boolean
   isCheckingAuth: boolean
   setAuthUser: (user: AuthUser | null) => void
@@ -17,6 +18,7 @@ interface AuthState {
   setCheckingAuth: (value: boolean) => void
   register: (data: RegisterFormType) => Promise<void>
   login: (data: LoginFormType) => Promise<void>
+  logout: () => Promise<void>
   setToken: (token: string) => void
   getToken: () => string | null
   clearToken: () => void
@@ -28,11 +30,11 @@ export const useAuthStore = create<AuthState>()(
       authUser: null,
       isLoggingIn: false,
       isSigningUp: false,
+      isLoggingOut: false,
       isUpdatingProfile: false,
       isCheckingAuth: true,
 
       setAuthUser: (user) => set({ authUser: user }),
-
       checkAuth: async () => {
         set({ isCheckingAuth: true })
         try {
@@ -52,9 +54,7 @@ export const useAuthStore = create<AuthState>()(
           set({ isCheckingAuth: false })
         }
       },
-
       setCheckingAuth: (value) => set({ isCheckingAuth: value }),
-
       register: async (data) => {
         set({ isSigningUp: true })
         try {
@@ -69,7 +69,6 @@ export const useAuthStore = create<AuthState>()(
           set({ isSigningUp: false })
         }
       },
-
       login: async (data) => {
         set({ isLoggingIn: true })
         try {
@@ -84,7 +83,20 @@ export const useAuthStore = create<AuthState>()(
           set({ isLoggingIn: false })
         }
       },
-
+      logout: async () => {
+        set({ isLoggingOut: true })
+        try {
+          await api.post('/auth/logout')
+          get().clearToken()
+          set({ authUser: null })
+          get().checkAuth()
+        } catch (error) {
+          console.log('Error logging out user', error)
+          throw error
+        } finally {
+          set({ isLoggingOut: false })
+        }
+      },
       setToken: (token) => {
         localStorage.setItem(TOKEN, token)
       },
