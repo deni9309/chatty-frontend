@@ -11,6 +11,7 @@ import { registerFormDefaultValues } from '../constants/form-default-values'
 import FormInputText from '../components/shared/form-input-text'
 import ChattyLogo from '../components/shared/chatty-logo-component'
 import { useAuthStore } from '../store/use-auth.store'
+import { handleApiError } from '../lib/utils/handle-api-errors'
 
 const RegisterPage = () => {
   const { isSigningUp, register } = useAuthStore()
@@ -28,11 +29,8 @@ const RegisterPage = () => {
       toast.success('Welcome to Chatty!')
       navigate('/')
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorText(error.message)
-      } else {
-        setErrorText('Something went wrong')
-      }
+      const message = handleApiError(error)
+      setErrorText(message)
     }
   }
 

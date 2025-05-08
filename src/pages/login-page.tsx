@@ -12,6 +12,7 @@ import { LoginFormType, LoginSchema } from '../schemas/login.schema'
 import { loginFormDefaultValues } from '../constants/form-default-values'
 import ChattyLogo from '../components/shared/chatty-logo-component'
 import FormInputText from '../components/shared/form-input-text'
+import { handleApiError } from '../lib/utils/handle-api-errors'
 
 const LoginPage = () => {
   const { isLoggingIn, login } = useAuthStore()
@@ -29,11 +30,8 @@ const LoginPage = () => {
       toast.success('Welcome back!')
       navigate('/')
     } catch (error) {
-      if (error instanceof Error) {
-        setErrorText(error.message)
-      } else {
-        setErrorText('Something went wrong')
-      }
+      const message = handleApiError(error)
+      setErrorText(message)
     }
   }
 

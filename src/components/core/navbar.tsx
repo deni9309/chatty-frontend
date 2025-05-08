@@ -1,8 +1,17 @@
-import { MenuIcon } from 'lucide-react'
+import {
+  HomeIcon,
+  LogOut,
+  MenuIcon,
+  MessageSquareIcon,
+  Settings,
+  User,
+  UserIcon,
+} from 'lucide-react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../store/use-auth.store'
 import ChattyLogo from '../shared/chatty-logo-component'
 import toast from 'react-hot-toast'
+import { cn } from '../../lib/utils/clsx'
 
 const Navbar = () => {
   const { authUser, logout } = useAuthStore()
@@ -20,7 +29,7 @@ const Navbar = () => {
   }
 
   return (
-    <div className="navbar bg-base-100 shadow-sm">
+    <header className="navbar bg-base-100 shadow-sm">
       <div className="navbar-start">
         <div className="dropdown">
           <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -31,21 +40,17 @@ const Navbar = () => {
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
             <li>
-              <a>Item 1</a>
+              <Link to="/home">
+                <HomeIcon />
+                Home
+              </Link>
             </li>
+            <hr className="my-1" />
             <li>
-              <a>Parent</a>
-              <ul className="p-2">
-                <li>
-                  <a>Submenu 1</a>
-                </li>
-                <li>
-                  <a>Submenu 2</a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a>Item 3</a>
+              <Link to="#">
+                <MessageSquareIcon />
+                Chats
+              </Link>
             </li>
           </ul>
         </div>
@@ -53,63 +58,69 @@ const Navbar = () => {
           <ChattyLogo showTitle className="text-primary size-8" />
         </Link>
       </div>
-      <div className="navbar-center hidden lg:flex">
-        <ul className="menu menu-horizontal px-1">
-          <li>
-            <a>Item 1</a>
-          </li>
-          <li>
-            <details>
-              <summary>Parent</summary>
-              <ul className="p-2">
-                <li>
-                  <a>Submenu 1</a>
-                </li>
-                <li>
-                  <a>Submenu 2</a>
-                </li>
-              </ul>
-            </details>
-          </li>
-          <li>
-            <a>Item 3</a>
-          </li>
-        </ul>
-      </div>
-      <div className="navbar-end mr-3">
-        {authUser ? (
+      {authUser && (
+        <div className="navbar-center hidden lg:flex">
+          <ul className="menu menu-horizontal px-1 [&_svg]:size-6">
+            <li>
+              <Link to="/home">
+                <HomeIcon />
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link to="#">
+                <MessageSquareIcon />
+                Chats
+              </Link>
+            </li>
+          </ul>
+        </div>
+      )}
+      <div className="navbar-end mr-3 [&_svg]:size-6">
+        {authUser && (
           <div className="dropdown dropdown-end">
-            <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-              <div className="w-10 rounded-full">
-                <img
-                  alt='Profile and Settings'
-                  src={authUser.profilePic || 'chatty.svg'}
-                />
-              </div>
+            <div
+              tabIndex={0}
+              role="button"
+              className={cn('btn btn-ghost btn-circle', authUser.profilePic !== '' && 'avatar')}
+            >
+              {authUser.profilePic !== '' ? (
+                <img alt="User" src={authUser.profilePic} />
+              ) : (
+                <UserIcon />
+              )}
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+              className="menu menu-sm dropdown-content [&_svg]:size-5 bg-base-100 rounded-box z-1 mt-3 w-48 p-2 shadow"
             >
               <li>
-                <a className="justify-between">
+                <Link to="/profile">
+                  <User />
                   Profile
-                  <span className="badge">New</span>
-                </a>
+                </Link>
               </li>
               <li>
-                <a>Settings</a>
-              </li>
-              <li>
-                <p onClick={handleLogout}>Logout</p>
+                <p onClick={handleLogout}>
+                  <LogOut />
+                  Logout
+                </p>
               </li>
             </ul>
           </div>
-        ) : (
-          <div></div>
         )}
+        <div className="menu menu-horizontal px-1">
+          <ul>
+            <li className="flex items-center gap-1">
+              <span>
+                <Settings />
+                <Link to="/settings">Settings</Link>
+              </span>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
+    </header>
   )
 }
 

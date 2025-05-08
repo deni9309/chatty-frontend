@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+
 import { AuthUser } from '../types/authUser'
 import { AUTH_STORAGE, TOKEN } from '../constants/app-constants'
 import api from '../lib/axios'
@@ -109,8 +110,6 @@ export const useAuthStore = create<AuthState>()(
         set({ authUser: null })
       },
     }),
-    {
-      name: AUTH_STORAGE,
-    },
+    { name: AUTH_STORAGE },
   ),
 )
