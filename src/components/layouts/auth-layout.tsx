@@ -53,9 +53,9 @@ const AuthLayout: React.FC = () => {
             alt="Background gradient"
             width={0}
             height={0}
-            className="w-full h-full min-h-[100vh] border-l-4 border-gradient-to-b from-yellow-600 to-gray-800 animate-gradient-border"
+            className="w-full dark:invert-0 invert h-[calc(100vh-72px)] border-l-4 border-gradient-to-b from-info-content to-warning-content animate-gradient-border"
           />
-          <div ref={overlayRef} className="glow-overlay bg-cyan-600/50" />
+          <div ref={overlayRef} className="glow-overlay bg-primary/50" />
         </div>
       </div>
     </div>

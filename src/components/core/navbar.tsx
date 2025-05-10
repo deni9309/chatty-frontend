@@ -31,29 +31,31 @@ const Navbar = () => {
   return (
     <header className="navbar bg-base-100 shadow-sm">
       <div className="navbar-start">
-        <div className="dropdown">
-          <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
-            <MenuIcon className="size-6" />
+        {authUser && (
+          <div className="dropdown">
+            <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
+              <MenuIcon className="size-6" />
+            </div>
+            <ul
+              tabIndex={0}
+              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+            >
+              <li>
+                <Link to="/home">
+                  <HomeIcon />
+                  Home
+                </Link>
+              </li>
+              <hr className="my-1" />
+              <li>
+                <Link to="#">
+                  <MessageSquareIcon />
+                  Chats
+                </Link>
+              </li>
+            </ul>
           </div>
-          <ul
-            tabIndex={0}
-            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-          >
-            <li>
-              <Link to="/home">
-                <HomeIcon />
-                Home
-              </Link>
-            </li>
-            <hr className="my-1" />
-            <li>
-              <Link to="#">
-                <MessageSquareIcon />
-                Chats
-              </Link>
-            </li>
-          </ul>
-        </div>
+        )}
         <Link to={authUser ? '/' : '/login'} className="btn btn-ghost hover:bg-transparent">
           <ChattyLogo showTitle className="text-primary size-8" />
         </Link>
@@ -112,10 +114,10 @@ const Navbar = () => {
         <div className="menu menu-horizontal px-1">
           <ul>
             <li className="flex items-center gap-1">
-              <span>
+              <Link to="/settings">
                 <Settings />
-                <Link to="/settings">Settings</Link>
-              </span>
+                Settings
+              </Link>
             </li>
           </ul>
         </div>

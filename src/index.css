@@ -2,15 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  :root {
+    --tw-color-base-100: theme(colors.base-100);
+    --tw-color-base-200: theme(colors.base-200);
+    --tw-color-base-300: theme(colors.base-300);
+    --tw-color-base-content: theme(colors.base-content);
+    --tw-color-primary: theme(colors.primary);
+    --tw-color-secondary: theme(colors.secondary);
+    --tw-color-accent: theme(colors.accent);
+    --tw-color-neutral: theme(colors.neutral);
+    --tw-color-warning: theme(colors.warning);
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  /* background: #323232;
-  width: 100%;
-  height: 100%; */
 }
-
 
 /* width */
 ::-webkit-scrollbar {
@@ -19,19 +29,20 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #323232;
+  background: var(--tw-color-accent, #323232);
 
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #757575;
+  background: var(--tw-color-neutral, #757575);
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #848484;
+  background: var(--tw-color-base, #848484);
 }
+
 
 .glow-overlay {
   --glow-size: 25rem;
