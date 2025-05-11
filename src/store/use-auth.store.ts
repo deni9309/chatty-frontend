@@ -6,6 +6,7 @@ import { AUTH_STORAGE, TOKEN } from '../constants/app-constants'
 import api from '../lib/axios'
 import { RegisterFormType } from '../schemas/register.schema'
 import { LoginFormType } from '../schemas/login.schema'
+import { UpdateProfileFormType } from '../schemas/update-profile.schema'
 
 interface AuthState {
   authUser: AuthUser | null
@@ -20,6 +21,7 @@ interface AuthState {
   register: (data: RegisterFormType) => Promise<void>
   login: (data: LoginFormType) => Promise<void>
   logout: () => Promise<void>
+  updateProfile: (data: UpdateProfileFormType) => Promise<void>
   setToken: (token: string) => void
   getToken: () => string | null
   clearToken: () => void
@@ -96,6 +98,31 @@ export const useAuthStore = create<AuthState>()(
           throw error
         } finally {
           set({ isLoggingOut: false })
+        }
+      },
+
+      updateProfile: async (data) => {
+        set({ isUpdatingProfile: true })
+        try {
+          const formData = new FormData()
+          if (data.email) formData.append('email', data.email)
+          if (data.fullName) formData.append('fullName', data.fullName)
+          if (data.profilePic instanceof File) formData.append('profilePic', data.profilePic)
+
+          if (!formData.has('email') && !formData.has('fullName') && !formData.has('profilePic')) {
+            throw new Error('No data to update')
+          }
+
+          const res = await api.put<AuthUser>('/auth/update', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          })
+          
+          set({ authUser: res.data })
+        } catch (error) {
+          console.log('Error updating profile', error)
+          throw error
+        } finally {
+          set({ isUpdatingProfile: false })
         }
       },
       setToken: (token) => {

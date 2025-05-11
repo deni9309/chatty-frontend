@@ -42,7 +42,11 @@ const FormInputText = <T extends FieldValues>({
       render={({ field: { onChange, value }, fieldState: { error } }) => (
         <div className={cn('form-control', classNames ?? '')}>
           <label className="input input-bordered flex items-center gap-2">
-            {Icon && <Icon className="size-5 text-base-content/40" />}
+            {Icon && (
+              <div className="tooltip" data-tip={label}>
+                <Icon className="size-5 text-base-content/40" />
+              </div>
+            )}
             <input
               type={
                 name === ('password' as keyof Path<T>)
