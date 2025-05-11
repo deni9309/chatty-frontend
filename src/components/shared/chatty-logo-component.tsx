@@ -50,7 +50,7 @@ const ChattyLogo = ({ className, showTitle = true }: ChattyLogoProps) => (
       c0.294,3.513,1.031,7.961,2.829,11.135C54.512,47.517,51.185,46.679,48.094,45.343z"
       />
     </svg>
-    {showTitle && <h2 className="text-2xl font-extrabold">CHATTY</h2>}
+    {showTitle && <h2 className="text-2xl max-sm:text-xl font-extrabold">CHATTY</h2>}
   </div>
 )
 

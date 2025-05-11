@@ -30,7 +30,7 @@ const Navbar = () => {
 
   return (
     <header className="navbar bg-base-100 shadow-sm">
-      <div className="navbar-start">
+      <div className="navbar-start shrink-0">
         {authUser && (
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -56,8 +56,11 @@ const Navbar = () => {
             </ul>
           </div>
         )}
-        <Link to={authUser ? '/' : '/login'} className="btn btn-ghost hover:bg-transparent">
-          <ChattyLogo showTitle className="text-primary size-8" />
+        <Link
+          to={authUser ? '/' : '/login'}
+          className="btn btn-ghost max-sm:px-1 hover:bg-transparent"
+        >
+          <ChattyLogo showTitle className="text-primary size-8 max-sm:size-6" />
         </Link>
       </div>
       {authUser && (
@@ -78,13 +81,16 @@ const Navbar = () => {
           </ul>
         </div>
       )}
-      <div className="navbar-end mr-3 [&_svg]:size-6">
+      <div className="navbar-end sm:mr-3 [&_svg]:size-6">
         {authUser && (
           <div className="dropdown dropdown-end">
             <div
               tabIndex={0}
               role="button"
-              className={cn('btn btn-ghost btn-circle', authUser.profilePic !== '' && 'avatar')}
+              className={cn(
+                'btn btn-ghost justify-end btn-circle',
+                authUser.profilePic !== '' && 'avatar',
+              )}
             >
               {authUser.profilePic !== '' ? (
                 <img alt="User" src={authUser.profilePic} />
@@ -111,12 +117,12 @@ const Navbar = () => {
             </ul>
           </div>
         )}
-        <div className="menu menu-horizontal px-1">
+        <div className="menu menu-horizontal px-0 sm:px-1">
           <ul>
-            <li className="flex items-center gap-1">
+            <li className="flex items-center md:gap-1">
               <Link to="/settings">
                 <Settings />
-                Settings
+                <span className="hidden md:block">Settings</span>
               </Link>
             </li>
           </ul>
