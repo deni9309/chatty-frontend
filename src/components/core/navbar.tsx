@@ -7,10 +7,11 @@ import {
   User,
   UserIcon,
 } from 'lucide-react'
+import toast from 'react-hot-toast'
 import { Link, useNavigate } from 'react-router-dom'
+
 import { useAuthStore } from '../../store/use-auth.store'
 import ChattyLogo from '../shared/chatty-logo-component'
-import toast from 'react-hot-toast'
 import { cn } from '../../lib/utils/clsx'
 
 const Navbar = () => {
@@ -30,7 +31,7 @@ const Navbar = () => {
 
   return (
     <header className="navbar bg-base-100 shadow-sm">
-      <div className="navbar-start shrink-0">
+      <div className="navbar-start">
         {authUser && (
           <div className="dropdown">
             <div tabIndex={0} role="button" className="btn btn-ghost lg:hidden">
@@ -38,17 +39,17 @@ const Navbar = () => {
             </div>
             <ul
               tabIndex={0}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow transition-all duration-300"
             >
               <li>
-                <Link to="/home">
+                <Link to="/home" onClick={(e) => e.currentTarget.blur()}>
                   <HomeIcon />
                   Home
                 </Link>
               </li>
               <hr className="my-1" />
               <li>
-                <Link to="#">
+                <Link to="#" onClick={(e) => e.currentTarget.blur()}>
                   <MessageSquareIcon />
                   Chats
                 </Link>
@@ -88,12 +89,12 @@ const Navbar = () => {
               tabIndex={0}
               role="button"
               className={cn(
-                'btn btn-ghost justify-end btn-circle',
+                'btn btn-ghost btn-circle transition-all duration-300',
                 authUser.profilePic !== '' && 'avatar',
               )}
             >
               {authUser.profilePic !== '' ? (
-                <img alt="User" src={authUser.profilePic} />
+                <img alt="User" src={authUser.profilePic} className='rounded-full' />
               ) : (
                 <UserIcon />
               )}
@@ -103,13 +104,18 @@ const Navbar = () => {
               className="menu menu-sm dropdown-content [&_svg]:size-5 bg-base-100 rounded-box z-1 mt-3 w-48 p-2 shadow"
             >
               <li>
-                <Link to="/profile">
+                <Link to="/profile" onClick={(e) => e.currentTarget.blur()}>
                   <User />
                   Profile
                 </Link>
               </li>
               <li>
-                <p onClick={handleLogout}>
+                <p
+                  onClick={(e) => {
+                    e.currentTarget.blur()
+                    handleLogout()
+                  }}
+                >
                   <LogOut />
                   Logout
                 </p>

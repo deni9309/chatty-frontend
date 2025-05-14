@@ -8,6 +8,7 @@ interface FormInputTextProps<T extends FieldValues> {
   control: Control<T>
   name: Path<T>
   label: string
+  showLabel?: boolean
   type?: React.HTMLInputTypeAttribute | undefined
   icon?: LucideIcon
   placeholder?: string | undefined
@@ -17,6 +18,7 @@ const FormInputText = <T extends FieldValues>({
   control,
   name,
   label,
+  showLabel = false,
   type,
   icon,
   placeholder,
@@ -40,48 +42,60 @@ const FormInputText = <T extends FieldValues>({
       control={control}
       name={name}
       render={({ field: { onChange, value }, fieldState: { error } }) => (
-        <div className={cn('form-control', classNames ?? '')}>
-          <label className="input input-bordered flex items-center gap-2">
+        <div className="w-full flex">
+          <div
+            className={cn(
+              'badge badge-ghost rounded-s-xl rounded-e-none h-auto justify-start',
+              showLabel && 'w-full gap-x-1 max-w-[75px] sm:max-w-[120px]',
+            )}
+          >
             {Icon && (
               <div className="tooltip" data-tip={label}>
-                <Icon className="size-5 text-base-content/40" />
+                <Icon className="size-5 text-base-content/50" />
               </div>
             )}
-            <input
-              type={
-                name === ('password' as keyof Path<T>)
-                  ? showPassword
-                    ? 'text'
-                    : 'password'
-                  : type || 'text'
-              }
-              autoComplete="off"
-              placeholder={placeholder || ''}
-              className="grow"
-              value={value || ''}
-              onChange={onChange}
-              title={label || ''}
-              aria-label={label ?? name}
-            />
-            {name === ('password' as keyof Path<T>) && (
-              <button
-                type="button"
-                onClick={onClickShowPassword}
-                onMouseDown={onMouseDownPassword}
-                onMouseUp={onMouseUpPassword}
-              >
-                {showPassword ? (
-                  <Eye className="size-5 text-base-content/40" aria-label="Password is visible" />
-                ) : (
-                  <EyeClosed
-                    className="size-5 text-base-content/40"
-                    aria-label="Password is hidden"
-                  />
-                )}
-              </button>
+            {showLabel && (
+              <span className="text-sm max-sm:text-xs text-base-content/50">{label}</span>
             )}
-          </label>
-          {error && <p className="text-sm text-red-500 mt-1">{error.message}</p>}
+          </div>
+          <div className={cn('form-control grow', classNames ?? '')}>
+            <label className="input input-bordered rounded-s-none flex items-center gap-2">
+              <input
+                type={
+                  name === ('password' as keyof Path<T>)
+                    ? showPassword
+                      ? 'text'
+                      : 'password'
+                    : type || 'text'
+                }
+                autoComplete="off"
+                placeholder={placeholder || ''}
+                className="grow"
+                value={value || ''}
+                onChange={onChange}
+                title={label || ''}
+                aria-label={label ?? name}
+              />
+              {name === ('password' as keyof Path<T>) && (
+                <button
+                  type="button"
+                  onClick={onClickShowPassword}
+                  onMouseDown={onMouseDownPassword}
+                  onMouseUp={onMouseUpPassword}
+                >
+                  {showPassword ? (
+                    <Eye className="size-5 text-base-content/40" aria-label="Password is visible" />
+                  ) : (
+                    <EyeClosed
+                      className="size-5 text-base-content/40"
+                      aria-label="Password is hidden"
+                    />
+                  )}
+                </button>
+              )}
+            </label>
+            {error && <p className="text-sm text-red-500 mt-1">{error.message}</p>}
+          </div>
         </div>
       )}
     />

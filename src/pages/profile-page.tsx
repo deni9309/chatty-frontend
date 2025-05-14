@@ -45,7 +45,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="flex flex-col w-full items-center mx-auto max-sm:mx-0.5">
+    <div className="flex flex-col w-full items-center mx-auto">
       <div className="text-center my-8">
         <ChattyLogo className="text-primary size-10" />
         <p>Update your profile information here</p>
@@ -57,7 +57,7 @@ const ProfilePage = () => {
         encType="multipart/form-data"
         className="space-y-4 w-full max-w-md"
       >
-        <div className='f-center'>
+        <div className="f-center">
           <ProfileImageUpload
             initialImageUrl={authUser?.profilePic || ''}
             onFileSelect={(file) => form.setValue('profilePic', file)}
@@ -67,10 +67,17 @@ const ProfilePage = () => {
           name="email"
           control={form.control}
           label="Email"
+          showLabel
           type="email"
           icon={AtSign}
         />
-        <FormInputText name="fullName" control={form.control} label="Full Name" icon={LucideUser} />
+        <FormInputText
+          name="fullName"
+          control={form.control}
+          label="Full Name"
+          showLabel
+          icon={LucideUser}
+        />
 
         <button disabled={isUpdatingProfile} className="btn btn-primary">
           Update Profile
