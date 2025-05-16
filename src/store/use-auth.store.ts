@@ -7,6 +7,7 @@ import api from '../lib/axios'
 import { RegisterFormType } from '../schemas/register.schema'
 import { LoginFormType } from '../schemas/login.schema'
 import { UpdateProfileFormType } from '../schemas/update-profile.schema'
+import { PROFILE_IMAGE_DELETED } from '../constants/profile-image-delete.constant'
 
 interface AuthState {
   authUser: AuthUser | null
@@ -107,7 +108,12 @@ export const useAuthStore = create<AuthState>()(
           const formData = new FormData()
           if (data.email) formData.append('email', data.email)
           if (data.fullName) formData.append('fullName', data.fullName)
-          if (data.profilePic instanceof File) formData.append('profilePic', data.profilePic)
+
+          if (data.profilePic === PROFILE_IMAGE_DELETED) {
+            formData.append('profilePic', '')
+          } else if (data.profilePic instanceof File) {
+            formData.append('profilePic', data.profilePic)
+          }
 
           if (!formData.has('email') && !formData.has('fullName') && !formData.has('profilePic')) {
             throw new Error('No data to update')
@@ -116,7 +122,7 @@ export const useAuthStore = create<AuthState>()(
           const res = await api.put<AuthUser>('/auth/update', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           })
-          
+
           set({ authUser: res.data })
         } catch (error) {
           console.log('Error updating profile', error)

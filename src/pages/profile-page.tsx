@@ -10,6 +10,7 @@ import { useAuthStore } from '../store/use-auth.store'
 import toast from 'react-hot-toast'
 import { handleApiError } from '../lib/utils/handle-api-errors'
 import ProfileImageUpload from '../components/shared/profile-image-upload'
+import { PROFILE_IMAGE_DELETED } from '../constants/profile-image-delete.constant'
 
 const ProfilePage = () => {
   const { authUser, isUpdatingProfile, updateProfile } = useAuthStore()
@@ -61,6 +62,7 @@ const ProfilePage = () => {
           <ProfileImageUpload
             initialImageUrl={authUser?.profilePic || ''}
             onFileSelect={(file) => form.setValue('profilePic', file)}
+            onDeleteImage={() => form.setValue('profilePic', PROFILE_IMAGE_DELETED)}
           />
         </div>
         <FormInputText

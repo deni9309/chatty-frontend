@@ -90,7 +90,7 @@ const Navbar = () => {
               role="button"
               className={cn(
                 'btn btn-ghost btn-circle transition-all duration-300',
-                authUser.profilePic !== '' && 'avatar',
+                authUser.profilePic !== '' && 'avatar flex',
               )}
             >
               {authUser.profilePic !== '' ? (
