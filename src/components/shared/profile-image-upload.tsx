@@ -69,7 +69,7 @@ export default function ProfileImageUpload({
         <button
           type="button"
           onClick={(e) => handleDelete(e)}
-          className="absolute top-2 -right-3 z-20 mt-2 flex items-center rounded-full bg-base-200 p-2 text-red-500 hover:text-red-700 transition"
+          className="absolute top-0 -right-2 z-20 mt-2 flex items-center rounded-full bg-base-200/80 p-2 text-red-500 hover:text-red-700 transition"
         >
           <div className="tooltip" data-tip={'Delete'}>
             <Trash2 />

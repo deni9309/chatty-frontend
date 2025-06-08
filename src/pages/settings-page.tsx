@@ -1,6 +1,12 @@
+import ThemeSwitcher from '../components/theme-switcher'
+
+
+
 const SettingsPage = () => {
   return (
-    <div>SettingsPage</div>
+    <div>
+      <ThemeSwitcher />
+    </div>
   )
 }
 

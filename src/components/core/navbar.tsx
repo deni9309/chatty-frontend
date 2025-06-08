@@ -47,7 +47,7 @@ const Navbar = () => {
                   Home
                 </Link>
               </li>
-              <hr className="my-1" />
+              <hr className="my-1 border-base-300" />
               <li>
                 <Link to="#" onClick={(e) => e.currentTarget.blur()}>
                   <MessageSquareIcon />
@@ -94,7 +94,7 @@ const Navbar = () => {
               )}
             >
               {authUser.profilePic !== '' ? (
-                <img alt="User" src={authUser.profilePic} className='rounded-full' />
+                <img alt="User" src={authUser.profilePic} className="rounded-full" />
               ) : (
                 <UserIcon />
               )}
@@ -109,6 +109,7 @@ const Navbar = () => {
                   Profile
                 </Link>
               </li>
+              <hr className="my-1 border-base-300" />
               <li>
                 <p
                   onClick={(e) => {
