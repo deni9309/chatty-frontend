@@ -49,6 +49,29 @@ const ThemeSwitcher = () => {
           ))}
         </div>
       </div>
+
+      <div className="p-4 space-y-4 min-h-[200px] max-h-[200px] overflow-y-auto bg-base-100">
+        {previewMessages.map((m) => (
+          <div key={m._id} className={cn('flex', m.isSent ? 'justify-end' : 'justify-start')}>
+            <div
+              className={cn(
+                'max-w-[80%] rounded-xl p-3 shadow-sm',
+                m.isSent ? 'bg-primary text-primary-content' : 'bg-base-300',
+              )}
+            >
+              <p className="text-sm">{m.content}</p>
+              <p
+                className={cn(
+                  'text-[10px] mt-1.5',
+                  m.isSent ? 'text-primary-content/70' : 'text-base-content/70',
+                )}
+              >
+                12:00 PM
+              </p>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   )
 }

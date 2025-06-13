@@ -24,6 +24,7 @@ const router = createBrowserRouter([
       { path: '/', element: <HomePage /> },
       { path: '/home', element: <HomePage /> },
       { path: '/profile', element: <ProfilePage /> },
+      { path: '/settings', element: <SettingsPage /> },
       // { path: '/chats/:_id', element: <ChatDetails /> },
     ],
   },
@@ -46,9 +47,9 @@ const router = createBrowserRouter([
           </GuestGuard>
         ),
       },
+      { path: '/settings', element: <SettingsPage /> },
     ],
   },
-  { path: '/settings', element: <SettingsPage /> },
   { path: '/error', element: <ErrorPage /> },
 ])
 

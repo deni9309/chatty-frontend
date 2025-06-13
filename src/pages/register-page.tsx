@@ -60,14 +60,14 @@ const RegisterPage = () => {
           icon={KeyRound}
         />
 
-        <button disabled={isSigningUp} className="btn btn-primary">
+        <button disabled={isSigningUp} className="btn btn-primary text-primary-content">
           Register
         </button>
       </form>
 
       <div className="flex w-full max-w-md text-sm gap-1 my-2">
         <span>Already have an account?</span>
-        <Link className="link link-primary " to="/login">
+        <Link className="link link-primary" to="/login">
           Login
         </Link>
       </div>

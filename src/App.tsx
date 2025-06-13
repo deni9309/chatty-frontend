@@ -4,7 +4,7 @@ import { Toaster } from 'react-hot-toast'
 
 const App = () => {
   return (
-    <div>
+    <div className='bg-base-100'>
       <RouterProvider router={router} />
       <Toaster />
     </div>

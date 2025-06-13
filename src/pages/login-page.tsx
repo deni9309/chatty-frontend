@@ -60,13 +60,13 @@ const LoginPage = () => {
           icon={KeyRound}
         />
 
-        <button disabled={isLoggingIn} className="btn btn-primary">
+        <button disabled={isLoggingIn} className="btn btn-primary text-primary-content">
           Login
         </button>
       </form>
       <div className="flex w-full max-w-md text-sm gap-1 my-2">
         <span>Don&apos;t have an account?</span>
-        <Link className="link link-primary " to="/register">
+        <Link className="link link-primary" to="/register">
           Register
         </Link>
       </div>

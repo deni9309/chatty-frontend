@@ -7,7 +7,7 @@ import { usePath } from '../../hooks/use-path.hook'
 
 const MainLayout: React.FC = () => {
   const { path } = usePath()
-  const showChatList = path !== '/profile'
+  const showChatList = path !== '/profile' && path !== '/settings'
  // const isHomePage = path === '/'
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
