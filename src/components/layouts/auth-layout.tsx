@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Outlet } from 'react-router-dom'
 import '../../index.css'
 import Navbar from '../core/navbar'
+import GeometricPattern from '../shared/geometric-pattern'
 
 const AuthLayout: React.FC = () => {
   const captureRef = useRef<HTMLDivElement>(null)
@@ -48,13 +49,7 @@ const AuthLayout: React.FC = () => {
           ref={captureRef}
           className="relative glow-capture max-lg:hidden w-auto flex-1 max-w-[40%]"
         >
-          <img
-            src="/bg-subtle-prism.svg"
-            alt="Background gradient"
-            width={0}
-            height={0}
-            className="w-full dark:invert-0 invert h-[calc(100vh-72px)] border-l-4 border-gradient-to-b from-info-content to-warning-content animate-gradient-border"
-          />
+          <GeometricPattern className="w-full h-[calc(100vh-72px)] border-l-4 border-accent/50" />
           <div ref={overlayRef} className="glow-overlay bg-primary/50" />
         </div>
       </div>

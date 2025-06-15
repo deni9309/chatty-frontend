@@ -1,11 +1,13 @@
+import PreviewMessages from '../components/preview-messages'
 import ThemeSwitcher from '../components/theme-switcher'
-
-
 
 const SettingsPage = () => {
   return (
-    <div>
-      <ThemeSwitcher />
+    <div className="container h-screen mx-auto px-4 pt-20 max-w-5xl">
+      <div className="space-y-6">
+        <ThemeSwitcher />
+        <PreviewMessages />
+      </div>
     </div>
   )
 }
