@@ -126,12 +126,14 @@ const Navbar = () => {
         )}
         <div className="menu menu-horizontal px-0 sm:px-1">
           <ul>
-            <li className="flex items-center md:gap-1">
-              <Link to="/settings">
-                <Settings />
-                <span className="hidden md:block">Settings</span>
-              </Link>
-            </li>
+            <span className="tooltip tooltip-bottom" data-tip="Settings">
+              <li className="flex items-center md:gap-1">
+                <Link to="/settings">
+                  <Settings />
+                  <span className="hidden md:block">Settings</span>
+                </Link>
+              </li>
+            </span>
           </ul>
         </div>
       </div>

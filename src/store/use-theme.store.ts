@@ -1,19 +1,25 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-import { THEME_STORAGE } from '../constants/app-constants'
-import { ThemeName } from '../types/themeName'
+import { DEFAULT_THEME, THEME_STORAGE } from '../constants/app-constants'
+import { Theme } from '../types/theme'
 
 interface ThemeState {
-  theme: ThemeName
-  setTheme: (theme: ThemeName) => void
+  theme: Theme
+  setTheme: (theme: Theme) => void
+  resetTheme: () => void
 }
 
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: 'dark',
-      setTheme: (theme) => set({ theme }),
+      theme: DEFAULT_THEME,
+      setTheme: (theme) => {
+        set({ theme })
+      },
+      resetTheme() {
+        set({ theme: DEFAULT_THEME })
+      },
     }),
     {
       name: THEME_STORAGE,

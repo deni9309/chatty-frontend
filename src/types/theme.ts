@@ -1,3 +1,3 @@
 import { themes } from '../constants/daisyui-themes.constant';
 
-export type ThemeName = typeof themes[number]
+export type Theme = typeof themes[number]

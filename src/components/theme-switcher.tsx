@@ -1,15 +1,9 @@
-import { useEffect } from 'react'
-
 import { useThemeStore } from '../store/use-theme.store'
 import { themes } from '../constants/daisyui-themes.constant'
 import { cn } from '../lib/utils/clsx'
 
 const ThemeSwitcher = () => {
   const { theme, setTheme } = useThemeStore()
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-  }, [theme])
 
   return (
     <>

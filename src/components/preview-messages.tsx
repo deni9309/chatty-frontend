@@ -1,3 +1,4 @@
+import { Send } from 'lucide-react'
 import { cn } from '../lib/utils/clsx'
 
 const previewMessages = [
@@ -6,7 +7,6 @@ const previewMessages = [
 ]
 
 const PreviewMessages = () => {
-
   return (
     <>
       <h3 className="text-lg font-semibold mb-3">Preview</h3>
@@ -53,6 +53,25 @@ const PreviewMessages = () => {
                     </div>
                   </div>
                 ))}
+              </div>
+
+              {/* Chat Input */}
+              <div className="p-4 border border-t border-base-300 bg-base-100">
+                <div className="flex max-sm:flex-col items-stretch gap-2">
+                  <input
+                    type="text"
+                    value="This is a preview"
+                    placeholder="Type a message..."
+                    className="input input-bordered p-2 flex-1 h-full text-sm"
+                    readOnly
+                  />
+
+                  <div className="tooltip tooltip-neutral max-sm:self-end" data-tip="Send">
+                    <button className="btn btn-primary btn-sm sm:h-full">
+                      <Send size={18} name="Send" aria-label="Send" role="button" />
+                    </button>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
