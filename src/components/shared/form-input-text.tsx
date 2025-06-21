@@ -45,7 +45,7 @@ const FormInputText = <T extends FieldValues>({
         <div className="w-full flex">
           <div
             className={cn(
-              'badge badge-ghost rounded-s-xl rounded-e-none h-auto justify-start',
+              'badge bg-base-content/10 rounded-e-none h-auto justify-start sm:ps-3',
               showLabel && 'w-full gap-x-1 max-w-[75px] sm:max-w-[120px]',
             )}
           >
@@ -55,7 +55,7 @@ const FormInputText = <T extends FieldValues>({
               </div>
             )}
             {showLabel && (
-              <span className="text-sm max-sm:text-xs text-base-content/50">{label}</span>
+              <span className="text-sm max-sm:text-xs text-base-content/70">{label}</span>
             )}
           </div>
           <div className={cn('form-control grow', classNames ?? '')}>

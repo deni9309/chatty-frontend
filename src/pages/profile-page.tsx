@@ -46,7 +46,7 @@ const ProfilePage = () => {
   }
 
   return (
-    <div className="flex flex-col w-full items-center mx-auto">
+    <div className="flex flex-col w-full items-center justify-center mx-auto sm:bg-base-content/10 sm:p-10 sm:rounded-2xl max-w-xl">
       <div className="text-center my-8">
         <ChattyLogo className="text-primary size-10" />
         <p>Update your profile information here</p>

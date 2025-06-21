@@ -10,7 +10,7 @@ const AnimateSquares = ({ title, subtitle }: AnimateSquaresProps) => {
           {[...Array(9)].map((_, i) => (
             <div
               key={i}
-              className={`aspect-square rounded-2xl bg-primary/10 ${
+              className={`aspect-square rounded-2xl bg-primary/40 ${
                 i % 2 === 0 ? 'animate-pulse' : ''
               }`}
             />
