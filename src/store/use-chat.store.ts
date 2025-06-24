@@ -50,7 +50,7 @@ export const useChatStore = create<ChatState>()(
       getUsers: async () => {
         set({ isUsersLoading: true })
         try {
-          const res = await api.get<AuthUser[]>('/other-users')
+          const res = await api.get<AuthUser[]>('/messages/users')
           set({ users: res.data })
         } catch (error) {
           console.log('Error getting users', error)
@@ -62,7 +62,7 @@ export const useChatStore = create<ChatState>()(
       getMessages: async (userId: string) => {
         set({ isMessagesLoading: true })
         try {
-          const res = await api.get<Message[]>('/mine-and', {
+          const res = await api.get<Message[]>('/messages/mine-and', {
             params: { userId },
           })
           set({ messages: res.data })
@@ -80,7 +80,9 @@ export const useChatStore = create<ChatState>()(
           return
         }
         try {
-          const res = await api.post<Message>('/message', messageData)
+          const res = await api.post<Message>('/messages/send', messageData, {
+            params: { id: selectedUser._id },
+          })
           set({ messages: [...messages, res.data] })
         } catch (error) {
           console.log('Error sending message', error)
