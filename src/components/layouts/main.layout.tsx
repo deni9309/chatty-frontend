@@ -2,13 +2,13 @@ import { Outlet } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { ArrowUpIcon } from '@heroicons/react/24/solid'
 import Navbar from '../core/navbar'
-//import ChatList from '../chat-list/chat-list'
 import { usePath } from '../../hooks/use-path.hook'
+import { isChatListVisible } from '../../lib/utils/routes.util'
+import ChatList from '../chat-list'
+import { cn } from '../../lib/utils/clsx'
 
 const MainLayout: React.FC = () => {
   const { path } = usePath()
-  const showChatList = path !== '/profile' && path !== '/settings'
- // const isHomePage = path === '/'
 
   const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
@@ -27,15 +27,15 @@ const MainLayout: React.FC = () => {
   return (
     <div className="flex flex-col h-screen w-full">
       <Navbar />
-      {showChatList ? (
+      {isChatListVisible(path) ? (
         isMobile ? (
           <>
-            <div className="flex-grow overflow-hidden mb-16">
+            <div className="flex-grow overflow-hidden mb-0">
               <Outlet />
             </div>
 
             {/* Bottom Navigation */}
-            <div className="fixed bottom-0 left-0 right-0 bg-base-100 border-t border-base-300 z-50">
+            <div className="fixed bottom-0 left-0 right-0 z-50">
               <button
                 className="btn btn-block btn-primary"
                 onClick={() => setDrawerOpen((prev) => !prev)}
@@ -47,27 +47,24 @@ const MainLayout: React.FC = () => {
 
             {/* Drawer */}
             <div
-              className={`fixed inset-0 z-40 transition-transform transform ${
-                isDrawerOpen ? 'translate-y-0' : 'translate-y-full'
-              }`}
+              className={cn(
+                'fixed inset-0 z-40 transition-all duration-300 transform',
+                isDrawerOpen ? 'translate-y-0 opacity-100' : 'translate-y-full opacity-0',
+              )}
             >
               <div
                 className="absolute inset-0 bg-black bg-opacity-50"
                 onClick={() => setDrawerOpen(false)}
-              ></div>
-              <div className="absolute bottom-0 left-0 right-0 bg-base-100 p-4 rounded-t-lg shadow-lg max-h-3/4 overflow-y-auto">
-                {/* <ChatList
-                  handleDrawerOnClick={() => {
-                    isMobile && setDrawerOpen(false)
-                  }}
-                /> */}
+              />
+              <div className="absolute w-full h-full bottom-0 left-0 right-0 bg-base-100 max-h-[calc(100vh-72px)] overflow-y-auto">
+                <ChatList />
               </div>
             </div>
           </>
         ) : (
           <div className="flex flex-grow">
             <div className="w-1/3 border-r border-base-300">
-              {/* <ChatList /> */}
+              <ChatList />
             </div>
             <div className="w-2/3 overflow-hidden">
               <Outlet />

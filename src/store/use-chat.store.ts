@@ -17,8 +17,8 @@ interface ChatState {
   messages: Message[]
   users: AuthUser[]
   selectedUser: AuthUser | null
-  isUsersLoading: boolean
-  isMessagesLoading: boolean
+  areUsersLoading: boolean
+  areMessagesLoading: boolean
 
   setMessages: (messages: Message[]) => void
   setUsers: (users: AuthUser[]) => void
@@ -36,8 +36,8 @@ export const useChatStore = create<ChatState>()(
       messages: [],
       users: [],
       selectedUser: null,
-      isUsersLoading: false,
-      isMessagesLoading: false,
+      areUsersLoading: false,
+      areMessagesLoading: false,
       setMessages(messages) {
         set({ messages })
       },
@@ -48,7 +48,7 @@ export const useChatStore = create<ChatState>()(
         set({ selectedUser })
       },
       getUsers: async () => {
-        set({ isUsersLoading: true })
+        set({ areUsersLoading: true })
         try {
           const res = await api.get<AuthUser[]>('/messages/users')
           set({ users: res.data })
@@ -56,11 +56,11 @@ export const useChatStore = create<ChatState>()(
           console.log('Error getting users', error)
           throw error
         } finally {
-          set({ isUsersLoading: false })
+          set({ areUsersLoading: false })
         }
       },
       getMessages: async (userId: string) => {
-        set({ isMessagesLoading: true })
+        set({ areMessagesLoading: true })
         try {
           const res = await api.get<Message[]>('/messages/mine-and', {
             params: { userId },
@@ -70,7 +70,7 @@ export const useChatStore = create<ChatState>()(
           console.log('Error getting messages', error)
           throw error
         } finally {
-          set({ isMessagesLoading: false })
+          set({ areMessagesLoading: false })
         }
       },
       sendMessage: async (messageData) => {
