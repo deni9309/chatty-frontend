@@ -29,7 +29,11 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
   }, [getUsers])
 
   const handleUserSelect = (user: AuthUser) => {
-    setSelectedUser(user)
+    if (selectedUser?._id === user._id) {
+      setSelectedUser(null)
+    } else {
+      setSelectedUser(user)
+    }
     handleDrawerOnClick?.()
   }
 

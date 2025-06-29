@@ -57,7 +57,7 @@ const MainLayout: React.FC = () => {
                 onClick={() => setDrawerOpen(false)}
               />
               <div className="absolute w-full h-full bottom-0 left-0 right-0 bg-base-100 max-h-[calc(100vh-72px)] overflow-y-auto">
-                <ChatList />
+                <ChatList handleDrawerOnClick={() => setDrawerOpen(false)} />
               </div>
             </div>
           </>
