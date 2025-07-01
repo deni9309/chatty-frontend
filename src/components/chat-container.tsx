@@ -27,11 +27,15 @@ const ChatContainer = () => {
       <div className="absolute inset-0 f-center">
         <div className="relative">
           <MessageCircleOffIcon
-            className="absolute text-accent/20 blur-sm"
+            className="w-full absolute text-accent/10 blur-sm max-sm:max-w-sm max-w-lg"
             size={600}
             strokeWidth={0.3}
           />
-          <MessageCircleOffIcon className="text-accent/8" size={600} strokeWidth={0.5} />
+          <MessageCircleOffIcon
+            className="w-full text-accent/10 max-sm:max-w-sm max-w-lg"
+            size={600}
+            strokeWidth={0.5}
+          />
         </div>
       </div>
       {/* Content overlay */}
@@ -42,20 +46,20 @@ const ChatContainer = () => {
         </div>
 
         {selectedUser && (
-          <div className="p-6 rounded-2xl bg-base-100/80 backdrop-blur-md shadow-xl border border-base-content/10 text-center">
+          <div className="p-6 rounded-box bg-base-100/50 backdrop-blur-sm drop-shadow border border-base-content/10 text-center">
             <div className="flex items-center justify-center gap-3 mb-2">
               <div className="avatar">
                 <div className="w-10 h-10 rounded-full">
                   {selectedUser.profilePic ? (
                     <img src={selectedUser.profilePic} alt={selectedUser.fullName} />
                   ) : (
-                    <div className="bg-accent text-accent-content flex items-center justify-center w-full h-full text-sm font-semibold">
+                    <div className="bg-accent text-accent-content f-center w-full h-full text-sm font-semibold">
                       {selectedUser.fullName.charAt(0).toUpperCase()}
                     </div>
                   )}
                 </div>
               </div>
-              <span className="font-semibold text-accent">{selectedUser.fullName}</span>
+              <span className="font-semibold text-base-content">{selectedUser.fullName}</span>
             </div>
             <p className="text-sm text-base-content/60">Send your first message to get started</p>
           </div>
