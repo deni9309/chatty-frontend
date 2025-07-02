@@ -62,9 +62,7 @@ export const useChatStore = create<ChatState>()(
       getMessages: async (userId: string) => {
         set({ areMessagesLoading: true })
         try {
-          const res = await api.get<Message[]>('/messages/mine-and', {
-            params: { userId },
-          })
+          const res = await api.get<Message[]>(`/messages/mine-and/${userId}`)
           set({ messages: res.data })
         } catch (error) {
           console.log('Error getting messages', error)

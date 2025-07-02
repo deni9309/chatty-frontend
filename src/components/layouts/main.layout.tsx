@@ -63,10 +63,10 @@ const MainLayout: React.FC = () => {
           </>
         ) : (
           <div className="flex flex-grow">
-            <div className="w-1/3 border-r border-base-300">
+            <aside className="w-1/4 border-r border-base-300">
               <ChatList />
-            </div>
-            <div className="w-2/3 overflow-hidden">
+            </aside>
+            <div className="w-3/4 overflow-hidden">
               <Outlet />
             </div>
           </div>

@@ -3,9 +3,9 @@ import { TriangleAlert } from 'lucide-react'
 
 import { useChatStore } from '../store/use-chat.store'
 import { AuthUser } from '../types/authUser'
-import Loader from './shared/loader'
 import { cn } from '../lib/utils/clsx'
 import { handleApiError } from '../lib/utils/handle-api-errors'
+import ChatListSkeleton from './skeletons/chat-list-skeleton'
 
 interface ChatListProps {
   handleDrawerOnClick?: () => void
@@ -14,6 +14,8 @@ interface ChatListProps {
 const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
   const { users, selectedUser, areUsersLoading, getUsers, setSelectedUser } = useChatStore()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  //const onlineUsers = []
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -38,11 +40,7 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
   }
 
   if (areUsersLoading) {
-    return (
-      <div className="f-center h-full">
-        <Loader sm />
-      </div>
-    )
+    return <ChatListSkeleton />
   }
 
   if (errorMessage) {
