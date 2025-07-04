@@ -67,4 +67,12 @@
   .error-text {
     @apply text-red-500/80 !text-sm p-3 bg-red-900/30 rounded visible transition ease-in duration-300;
   }
+
+  .avatar-online {
+    @apply [_&.online::before]:size-2 [_&.online::before]:bg-green-500
+  }
+
+  .avatar-offline {
+    @apply [_&.offline::before]:size-2 [_&.offline::before]:bg-gray-400
+  }
 }

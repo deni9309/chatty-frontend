@@ -55,7 +55,7 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
   }
 
   return (
-    <div className="p-4 border-t-2 flex flex-col items-stretch w-full h-full">
+    <div className="p-4 flex flex-col items-stretch w-full h-full">
       <h2 className="text-lg font-semibold mb-4 text-base-content">Chats</h2>
       {users.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
@@ -76,7 +76,8 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
             >
               <div className="flex items-center space-x-3">
                 {/* Profile Picture */}
-                <div className="avatar">
+
+                <div className={cn('avatar', user.profilePic ? 'online avatar-online' : 'offline avatar-offline')}>
                   <div className="size-10 rounded-full">
                     {user.profilePic ? (
                       <img
@@ -99,7 +100,6 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
                 </div>
 
                 {/* TODO: Make Online indicator dynamic */}
-                <div className="size-3 bg-success rounded-full" />
               </div>
             </div>
           ))}

@@ -30,7 +30,7 @@ const Navbar = () => {
   }
 
   return (
-    <header className="navbar bg-base-100 shadow-sm">
+    <header className="navbar shadow-sm border-b border-base-300 z-20 bg-base-100">
       <div className="navbar-start">
         {authUser && (
           <div className="dropdown">
