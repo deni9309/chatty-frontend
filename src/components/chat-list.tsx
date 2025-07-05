@@ -6,6 +6,7 @@ import { AuthUser } from '../types/authUser'
 import { cn } from '../lib/utils/clsx'
 import { handleApiError } from '../lib/utils/handle-api-errors'
 import ChatListSkeleton from './skeletons/chat-list-skeleton'
+import { useAuthStore } from '../store/use-auth.store'
 
 interface ChatListProps {
   handleDrawerOnClick?: () => void
@@ -15,7 +16,8 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
   const { users, selectedUser, areUsersLoading, getUsers, setSelectedUser } = useChatStore()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  //const onlineUsers = []
+  // TODO: use the online users from the auth store
+  const { onlineUsers: _ } = useAuthStore()
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -71,13 +73,16 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
                 'p-3 rounded-lg cursor-pointer transition-all duration-200',
                 selectedUser?._id === user._id
                   ? 'bg-primary text-primary-content'
-                  : 'hover:bg-base-200 bg-base-100',
+                  : 'hover:bg-base-300 bg-base-100',
               )}
             >
               <div className="flex items-center space-x-3">
-                {/* Profile Picture */}
-
-                <div className={cn('avatar', user.profilePic ? 'online avatar-online' : 'offline avatar-offline')}>
+                <div
+                  className={cn(
+                    'avatar',
+                    user.profilePic ? 'online avatar-online' : 'offline avatar-offline',
+                  )}
+                >
                   <div className="size-10 rounded-full">
                     {user.profilePic ? (
                       <img
@@ -98,8 +103,6 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
                   <p className="font-medium truncate">{user.fullName}</p>
                   <p className="text-sm opacity-70 truncate">{user.email}</p>
                 </div>
-
-                {/* TODO: Make Online indicator dynamic */}
               </div>
             </div>
           ))}

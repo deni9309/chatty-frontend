@@ -16,6 +16,7 @@ interface AuthState {
   isLoggingOut: boolean
   isUpdatingProfile: boolean
   isCheckingAuth: boolean
+  onlineUsers: AuthUser[]
   setAuthUser: (user: AuthUser | null) => void
   checkAuth: () => Promise<void>
   setCheckingAuth: (value: boolean) => void
@@ -26,6 +27,7 @@ interface AuthState {
   setToken: (token: string) => void
   getToken: () => string | null
   clearToken: () => void
+  setOnlineUsers: (users: AuthUser[]) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -37,6 +39,7 @@ export const useAuthStore = create<AuthState>()(
       isLoggingOut: false,
       isUpdatingProfile: false,
       isCheckingAuth: true,
+      onlineUsers: [],
 
       setAuthUser: (user) => set({ authUser: user }),
       checkAuth: async () => {
@@ -142,6 +145,7 @@ export const useAuthStore = create<AuthState>()(
         localStorage.removeItem(TOKEN)
         set({ authUser: null })
       },
+      setOnlineUsers: (users) => set({ onlineUsers: users }),
     }),
     { name: AUTH_STORAGE },
   ),
