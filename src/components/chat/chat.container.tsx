@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
-import { useChatStore } from '../store/use-chat.store'
-import Loader from './shared/loader'
-import NoChatMessagesContainer from './no-chat-messages-container'
+import { useChatStore } from '../../store/use-chat.store'
+import Loader from '../shared/loader'
+import NoChatMessagesContainer from './no-chat-messages.container'
 
 const ChatContainer = () => {
   const { selectedUser, messages, areMessagesLoading, getMessages } = useChatStore()

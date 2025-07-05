@@ -1,5 +1,5 @@
 import { MessageCircleOffIcon } from 'lucide-react'
-import { AuthUser } from '../types/authUser'
+import { AuthUser } from '../../types/authUser'
 
 const NoChatMessagesContainer = ({ selectedUser }: { selectedUser: AuthUser | null }) => {
   return (

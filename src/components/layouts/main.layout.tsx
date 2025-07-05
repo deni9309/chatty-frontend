@@ -4,7 +4,7 @@ import { ArrowUpIcon } from '@heroicons/react/24/solid'
 import Navbar from '../core/navbar'
 import { usePath } from '../../hooks/use-path.hook'
 import { isChatListVisible } from '../../lib/utils/routes.util'
-import ChatList from '../chat-list'
+import ChatListSidebar from '../chat/chat-list.sidebar'
 import { cn } from '../../lib/utils/clsx'
 
 const MainLayout: React.FC = () => {
@@ -57,14 +57,14 @@ const MainLayout: React.FC = () => {
                 onClick={() => setDrawerOpen(false)}
               />
               <div className="absolute w-full h-full bottom-0 left-0 right-0 bg-base-100 max-h-[calc(100vh-72px)] overflow-y-auto">
-                <ChatList handleDrawerOnClick={() => setDrawerOpen(false)} />
+                <ChatListSidebar handleDrawerOnClick={() => setDrawerOpen(false)} />
               </div>
             </div>
           </>
         ) : (
           <div className="flex flex-grow">
             <aside className="w-1/4 border-r border-base-300 overflow-y-auto h-[calc(100vh-72px)]">
-              <ChatList />
+              <ChatListSidebar />
             </aside>
             <div className="w-3/4 overflow-hidden">
               <Outlet />

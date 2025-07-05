@@ -1,18 +1,18 @@
 import { useEffect, useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
 
-import { useChatStore } from '../store/use-chat.store'
-import { AuthUser } from '../types/authUser'
-import { cn } from '../lib/utils/clsx'
-import { handleApiError } from '../lib/utils/handle-api-errors'
-import ChatListSkeleton from './skeletons/chat-list-skeleton'
-import { useAuthStore } from '../store/use-auth.store'
+import { useChatStore } from '../../store/use-chat.store'
+import { AuthUser } from '../../types/authUser'
+import { cn } from '../../lib/utils/clsx'
+import { handleApiError } from '../../lib/utils/handle-api-errors'
+import ChatListSkeleton from '../skeletons/chat-list-skeleton'
+import { useAuthStore } from '../../store/use-auth.store'
 
-interface ChatListProps {
+interface ChatListSidebarProps {
   handleDrawerOnClick?: () => void
 }
 
-const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
+const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   const { users, selectedUser, areUsersLoading, getUsers, setSelectedUser } = useChatStore()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
@@ -112,4 +112,4 @@ const ChatList = ({ handleDrawerOnClick }: ChatListProps) => {
   )
 }
 
-export default ChatList
+export default ChatListSidebar

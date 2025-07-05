@@ -1,5 +1,5 @@
 import { Send } from 'lucide-react'
-import { cn } from '../lib/utils/clsx'
+import { cn } from '../../lib/utils/clsx'
 
 const previewMessages = [
   { _id: '1', content: 'Hello. Are you there?', isSent: false },

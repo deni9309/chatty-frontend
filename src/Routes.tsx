@@ -6,7 +6,6 @@ import HomePage from './pages/home-page'
 import AuthLayout from './components/layouts/auth-layout'
 import MainLayout from './components/layouts/main.layout'
 
-//import ChatDetails from './components/chat/chat-details'
 import ErrorPage from './pages/shared/error-page'
 import SettingsPage from './pages/settings-page'
 import AuthGuard from './guards/auth-guard'

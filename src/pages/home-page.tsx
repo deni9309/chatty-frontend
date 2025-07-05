@@ -1,4 +1,4 @@
-import ChatContainer from '../components/chat-container'
+import ChatContainer from '../components/chat/chat.container'
 import AnimateSquares from '../components/shared/animate-squares'
 import { useChatStore } from '../store/use-chat.store'
 

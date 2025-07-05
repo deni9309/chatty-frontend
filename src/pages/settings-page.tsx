@@ -1,5 +1,6 @@
-import PreviewMessages from '../components/preview-messages'
-import ThemeSwitcher from '../components/theme-switcher'
+import PreviewMessages from '../components/daisy-ui/preview-messages'
+import ThemeSwitcher from '../components/daisy-ui/theme-switcher'
+
 
 const SettingsPage = () => {
   return (
