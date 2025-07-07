@@ -7,6 +7,7 @@ import { cn } from '../../lib/utils/clsx'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
 import ChatListSkeleton from '../skeletons/chat-list-skeleton'
 import { useAuthStore } from '../../store/use-auth.store'
+import UserAvatar from '../shared/user-avatar'
 
 interface ChatListSidebarProps {
   handleDrawerOnClick?: () => void
@@ -77,26 +78,7 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
               )}
             >
               <div className="flex items-center space-x-3">
-                <div
-                  className={cn(
-                    'avatar',
-                    user.profilePic ? 'online avatar-online' : 'offline avatar-offline',
-                  )}
-                >
-                  <div className="size-10 rounded-full">
-                    {user.profilePic ? (
-                      <img
-                        src={user.profilePic}
-                        alt={user.fullName}
-                        className="size-full object-cover"
-                      />
-                    ) : (
-                      <div className="bg-accent text-accent-content f-center size-full text-sm font-semibold">
-                        {user.fullName.charAt(0).toUpperCase()}
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <UserAvatar user={user} onlineIndicator />
 
                 {/* User Info */}
                 <div className="flex-1 min-w-0">
