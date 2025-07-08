@@ -1,9 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import toast from 'react-hot-toast'
 
 import api from '../lib/axios'
-
 import { CHAT_STORAGE } from '../constants/app-constants'
 import { AuthUser } from '../types/authUser'
 import { Message } from '../types/message'
@@ -73,14 +71,12 @@ export const useChatStore = create<ChatState>()(
       },
       sendMessage: async (messageData) => {
         const { selectedUser, messages } = get()
-        if (!selectedUser) {
-          toast.error('No user selected')
-          return
-        }
         try {
-          const res = await api.post<Message>('/messages/send', messageData, {
-            params: { id: selectedUser._id },
-          })
+          if (!selectedUser) {
+            throw new Error('No selected user')
+          }
+
+          const res = await api.post<Message>(`/messages/send/${selectedUser._id}`, messageData)
           set({ messages: [...messages, res.data] })
         } catch (error) {
           console.log('Error sending message', error)
