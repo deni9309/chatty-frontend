@@ -40,7 +40,7 @@ const AuthLayout: React.FC = () => {
   return (
     <div className="flex flex-col w-full h-screen">
       <Navbar />
-      <div className="flex max-lg:flex-col my-auto w-full">
+      <div className="flex max-lg:flex-col max-sm:px-1 my-auto w-full">
         <div className="flex-1 max-lg:flex py-4 my-auto max-h-[100dvh] overflow-y-auto">
           <Outlet />
         </div>

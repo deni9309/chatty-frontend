@@ -3,17 +3,17 @@ import { AuthUser } from '../../types/authUser'
 
 const NoChatMessagesContainer = ({ selectedUser }: { selectedUser: AuthUser | null }) => {
   return (
-    <div className="f-center h-full relative overflow-hidden bg-gradient-to-br from-base-100 to-base-200">
+    <div className="f-center min-h-[400px] relative overflow-hidden bg-gradient-to-br from-base-100 to-base-200">
       <div className="absolute inset-0 f-center">
         <div className="relative">
           <MessageCircleOffIcon
             className="w-full absolute text-accent/10 blur-sm max-sm:max-w-sm max-w-lg"
-            size={600}
+            size={400}
             strokeWidth={0.3}
           />
           <MessageCircleOffIcon
             className="w-full text-accent/10 max-sm:max-w-sm max-w-lg"
-            size={600}
+            size={400}
             strokeWidth={0.5}
           />
         </div>

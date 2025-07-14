@@ -25,7 +25,7 @@ const MainLayout: React.FC = () => {
   const isMobile = windowWidth < 900
 
   return (
-    <div className="flex flex-col h-screen w-full">
+    <div className="flex flex-col overflow-hidden h-screen w-full">
       <Navbar />
       {isChatListVisible(path) ? (
         isMobile ? (
