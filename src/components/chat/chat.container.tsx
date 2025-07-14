@@ -24,7 +24,7 @@ const ChatContainer = () => {
     )
   }
 
-  if (messages?.length > 0) {
+  if (messages?.length === 0) {
     return <NoChatMessagesContainer selectedUser={selectedUser} />
   }
 

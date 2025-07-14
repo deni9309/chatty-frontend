@@ -8,7 +8,7 @@ import { Message } from '../types/message'
 
 interface MessageData {
   text?: string
-  image?: string
+  image?: File
 }
 
 interface ChatState {
@@ -75,8 +75,15 @@ export const useChatStore = create<ChatState>()(
           if (!selectedUser) {
             throw new Error('No selected user')
           }
-
-          const res = await api.post<Message>(`/messages/send/${selectedUser._id}`, messageData)
+          
+          const formData = new FormData()
+          if (messageData.text) formData.append('text', messageData.text)
+          if (messageData.image) formData.append('image', messageData.image)
+          
+          const res = await api.post<Message>(`/messages/send/${selectedUser._id}`, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          })
+          
           set({ messages: [...messages, res.data] })
         } catch (error) {
           console.log('Error sending message', error)
