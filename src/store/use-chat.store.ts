@@ -75,15 +75,15 @@ export const useChatStore = create<ChatState>()(
           if (!selectedUser) {
             throw new Error('No selected user')
           }
-          
+
           const formData = new FormData()
           if (messageData.text) formData.append('text', messageData.text)
           if (messageData.image) formData.append('image', messageData.image)
-          
+
           const res = await api.post<Message>(`/messages/send/${selectedUser._id}`, formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           })
-          
+
           set({ messages: [...messages, res.data] })
         } catch (error) {
           console.log('Error sending message', error)
@@ -91,8 +91,8 @@ export const useChatStore = create<ChatState>()(
         }
       },
       subscribeToMessages: () => {
-        // const { selectedUser } = get()
-        // if (!selectedUser) return
+        const { selectedUser } = get()
+        if (!selectedUser) return
         // const socket = useAuthStore.getState().socket
         // if (!socket) return
         // socket.on('newMessage', (newMessage: Message) => {

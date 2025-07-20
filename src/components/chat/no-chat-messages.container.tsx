@@ -1,7 +1,10 @@
 import { MessageCircleOffIcon } from 'lucide-react'
-import { AuthUser } from '../../types/authUser'
 
-const NoChatMessagesContainer = ({ selectedUser }: { selectedUser: AuthUser | null }) => {
+import { useChatStore } from '../../store/use-chat.store'
+
+const NoChatMessagesContainer = () => {
+  const { selectedUser } = useChatStore()
+
   return (
     <div className="f-center min-h-[400px] relative overflow-hidden bg-gradient-to-br from-base-100 to-base-200">
       <div className="absolute inset-0 f-center">

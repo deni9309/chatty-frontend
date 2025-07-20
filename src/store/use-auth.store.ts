@@ -125,8 +125,9 @@ export const useAuthStore = create<AuthState>()(
           const res = await api.put<AuthUser>('/auth/update', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           })
-
+          
           set({ authUser: res.data })
+          
         } catch (error) {
           console.log('Error updating profile', error)
           throw error
