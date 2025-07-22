@@ -18,7 +18,7 @@ interface AuthState {
   isCheckingAuth: boolean
   onlineUsers: AuthUser[]
   setAuthUser: (user: AuthUser | null) => void
-  checkAuth: () => Promise<void>
+  checkAuth: (silent?: boolean) => Promise<void>
   setCheckingAuth: (value: boolean) => void
   register: (data: RegisterFormType) => Promise<void>
   login: (data: LoginFormType) => Promise<void>
@@ -28,6 +28,8 @@ interface AuthState {
   getToken: () => string | null
   clearToken: () => void
   setOnlineUsers: (users: AuthUser[]) => void
+  lastUpdated: number
+  isRefreshing: boolean
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -40,25 +42,40 @@ export const useAuthStore = create<AuthState>()(
       isUpdatingProfile: false,
       isCheckingAuth: true,
       onlineUsers: [],
+      lastUpdated: 0,
+      isRefreshing: false,
 
       setAuthUser: (user) => set({ authUser: user }),
-      checkAuth: async () => {
-        set({ isCheckingAuth: true })
+      checkAuth: async (silent = false) => {
+        if (silent) {
+          set({ isRefreshing: true })
+        } else {
+          set({ isCheckingAuth: true })
+        }
+
         try {
           const token = get().getToken()
           if (!token) {
-            set({ isCheckingAuth: false })
+            if (silent) {
+              set({ isRefreshing: false })
+            } else {
+              set({ isCheckingAuth: false })
+            }
             return
           }
 
           const res = await api.get<AuthUser>('/auth/me')
-          set({ authUser: res.data })
+          set({ authUser: res.data, lastUpdated: Date.now() })
         } catch (error) {
           console.log('Error checking auth', error)
           get().clearToken()
           set({ authUser: null })
         } finally {
-          set({ isCheckingAuth: false })
+          if (silent) {
+            set({ isRefreshing: false })
+          } else {
+            set({ isCheckingAuth: false })
+          }
         }
       },
       setCheckingAuth: (value) => set({ isCheckingAuth: value }),
@@ -125,9 +142,8 @@ export const useAuthStore = create<AuthState>()(
           const res = await api.put<AuthUser>('/auth/update', formData, {
             headers: { 'Content-Type': 'multipart/form-data' },
           })
-          
+
           set({ authUser: res.data })
-          
         } catch (error) {
           console.log('Error updating profile', error)
           throw error
