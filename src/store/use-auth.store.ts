@@ -28,8 +28,6 @@ interface AuthState {
   getToken: () => string | null
   clearToken: () => void
   setOnlineUsers: (users: AuthUser[]) => void
-  lastUpdated: number
-  isRefreshing: boolean
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -42,40 +40,25 @@ export const useAuthStore = create<AuthState>()(
       isUpdatingProfile: false,
       isCheckingAuth: true,
       onlineUsers: [],
-      lastUpdated: 0,
-      isRefreshing: false,
 
       setAuthUser: (user) => set({ authUser: user }),
-      checkAuth: async (silent = false) => {
-        if (silent) {
-          set({ isRefreshing: true })
-        } else {
-          set({ isCheckingAuth: true })
-        }
-
+      checkAuth: async () => {
+        set({ isCheckingAuth: true })
         try {
           const token = get().getToken()
           if (!token) {
-            if (silent) {
-              set({ isRefreshing: false })
-            } else {
-              set({ isCheckingAuth: false })
-            }
+            set({ isCheckingAuth: false })
             return
           }
 
           const res = await api.get<AuthUser>('/auth/me')
-          set({ authUser: res.data, lastUpdated: Date.now() })
+          set({ authUser: res.data })
         } catch (error) {
           console.log('Error checking auth', error)
           get().clearToken()
           set({ authUser: null })
         } finally {
-          if (silent) {
-            set({ isRefreshing: false })
-          } else {
-            set({ isCheckingAuth: false })
-          }
+          set({ isCheckingAuth: false })
         }
       },
       setCheckingAuth: (value) => set({ isCheckingAuth: value }),

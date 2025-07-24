@@ -4,8 +4,8 @@ import { persist } from 'zustand/middleware'
 import api from '../lib/axios'
 import { CHAT_STORAGE } from '../constants/app-constants'
 import { AuthUser } from '../types/authUser'
-import { Message } from '../types/message'
-import { useAuthStore } from './use-auth.store'
+import { Message, SingleMessage } from '../types/message'
+import { mapSingleMessageToMessage } from '../lib/utils/type-mappers'
 
 interface MessageData {
   text?: string
@@ -28,8 +28,6 @@ interface ChatState {
   subscribeToMessages: () => void
   unsubscribeFromMessages: () => void
 }
-
-let refreshTimeout: NodeJS.Timeout | null = null
 
 export const useChatStore = create<ChatState>()(
   persist(
@@ -83,28 +81,17 @@ export const useChatStore = create<ChatState>()(
           if (messageData.text) formData.append('text', messageData.text)
           if (messageData.image) formData.append('image', messageData.image)
 
-          const res = await api.post<Message>(`/messages/send/${selectedUser._id}`, formData, {
-            headers: { 'Content-Type': 'multipart/form-data' },
-          })
+          const res = await api.post<SingleMessage>(
+            `/messages/send/${selectedUser._id}`,
+            formData,
+            {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            },
+          )
 
-          set({ messages: [...messages, res.data] })
+          const message: Message = mapSingleMessageToMessage(res.data)
 
-          if (refreshTimeout) {
-            clearTimeout(refreshTimeout)
-          }
-
-          refreshTimeout = setTimeout(async () => {
-            try {
-              // const authStore = useAuthStore.getState()
-              //await authStore.checkAuth(true)
-              await get().getMessages(selectedUser._id)
-
-              console.log('User data refreshed after sending message')
-            } catch (refreshError) {
-              console.log('Error refreshing user data:', refreshError)
-            }
-            refreshTimeout = null
-          }, 300)
+          set({ messages: [...messages, message] })
         } catch (error) {
           console.log('Error sending message', error)
           throw error
@@ -127,12 +114,6 @@ export const useChatStore = create<ChatState>()(
         // const socket = useAuthStore.getState().socket
         // if (!socket) return
         // socket.off('newMessage')
-      },
-      cleanup: () => {
-        if (refreshTimeout) {
-          clearTimeout(refreshTimeout)
-          refreshTimeout = null
-        }
       },
     }),
     {
