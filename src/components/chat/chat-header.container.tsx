@@ -18,7 +18,7 @@ const ChatHeaderContainer = () => {
           <div>
             <h3 className="font-medium">{selectedUser.fullName}</h3>
             <p className="text-sm text-base-content/70">
-              {onlineUsers.some((u) => u._id === selectedUser._id) ? 'Online' : 'Offline'}
+              {onlineUsers.some((_id) => _id === selectedUser._id) ? 'Online' : 'Offline'}
             </p>
           </div>
         </div>
