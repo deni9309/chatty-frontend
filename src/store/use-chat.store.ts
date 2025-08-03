@@ -6,6 +6,7 @@ import { CHAT_STORAGE } from '../constants/app-constants'
 import { AuthUser } from '../types/authUser'
 import { Message, SingleMessage } from '../types/message'
 import { mapSingleMessageToMessage } from '../lib/utils/type-mappers'
+import { useAuthStore } from './use-auth.store'
 
 interface MessageData {
   text?: string
@@ -49,6 +50,11 @@ export const useChatStore = create<ChatState>()(
       getUsers: async () => {
         set({ areUsersLoading: true })
         try {
+          const authStore = useAuthStore.getState()
+          if (!authStore.authUser) {
+            return
+          }
+
           const res = await api.get<AuthUser[]>('/messages/users')
           set({ users: res.data })
         } catch (error) {
@@ -61,6 +67,11 @@ export const useChatStore = create<ChatState>()(
       getMessages: async (userId: string) => {
         set({ areMessagesLoading: true })
         try {
+          const authStore = useAuthStore.getState()
+          if (!authStore.authUser) {
+            return
+          }
+
           const res = await api.get<Message[]>(`/messages/mine-and/${userId}`)
           set({ messages: res.data })
         } catch (error) {
@@ -100,20 +111,22 @@ export const useChatStore = create<ChatState>()(
       subscribeToMessages: () => {
         const { selectedUser } = get()
         if (!selectedUser) return
-        // const socket = useAuthStore.getState().socket
-        // if (!socket) return
-        // socket.on('newMessage', (newMessage: Message) => {
-        //   const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id
-        //   if (!isMessageSentFromSelectedUser) return
-        //   set({
-        //     messages: [...get().messages, newMessage],
-        //   })
-        // })
+
+        const socket = useAuthStore.getState().socket
+        if (!socket) return
+
+        socket.on('new_message', (newMessage: Message) => {
+          const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id
+          if (!isMessageSentFromSelectedUser) return
+
+          set({ messages: [...get().messages, newMessage] })
+        })
       },
       unsubscribeFromMessages: () => {
-        // const socket = useAuthStore.getState().socket
-        // if (!socket) return
-        // socket.off('newMessage')
+        const socket = useAuthStore.getState().socket
+        if (!socket) return
+
+        socket.off('new_message')
       },
     }),
     {

@@ -6,7 +6,6 @@ import { AuthUser } from '../../types/authUser'
 import { cn } from '../../lib/utils/clsx'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
 import ChatListSkeleton from '../skeletons/chat-list-skeleton'
-import { useAuthStore } from '../../store/use-auth.store'
 import UserAvatar from '../shared/user-avatar'
 
 interface ChatListSidebarProps {
@@ -16,9 +15,6 @@ interface ChatListSidebarProps {
 const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   const { users, selectedUser, areUsersLoading, getUsers, setSelectedUser } = useChatStore()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
-  // TODO: use the online users from the auth store
-  const { onlineUsers: _ } = useAuthStore()
 
   useEffect(() => {
     const fetchUsers = async () => {

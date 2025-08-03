@@ -13,9 +13,12 @@ import { loginFormDefaultValues } from '../constants/form-default-values'
 import ChattyLogo from '../components/shared/chatty-logo-component'
 import FormInputText from '../components/shared/form-input-text'
 import { handleApiError } from '../lib/utils/handle-api-errors'
+import { useChatStore } from '../store/use-chat.store'
 
 const LoginPage = () => {
   const { isLoggingIn, login } = useAuthStore()
+  const setSelectedUser = useChatStore((state) => state.setSelectedUser)
+
   const [errorText, setErrorText] = useState<string | null>(null)
   const navigate = useNavigate()
 
@@ -26,6 +29,7 @@ const LoginPage = () => {
 
   async function onSubmit(values: LoginFormType) {
     try {
+      setSelectedUser(null)
       await login(values)
       toast.success('Welcome back!')
       navigate('/')

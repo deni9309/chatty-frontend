@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils/clsx'
+import { useAuthStore } from '../../store/use-auth.store'
 import { AuthUser } from '../../types/authUser'
 import { ClassNameValue } from 'tailwind-merge'
 
@@ -9,12 +10,14 @@ interface UserAvatarProps {
 }
 
 const UserAvatar = ({ user, classNames, onlineIndicator = false }: UserAvatarProps) => {
+  const { onlineUsers } = useAuthStore()
+
   return (
     <div
       className={cn(
         'avatar',
         onlineIndicator
-          ? user.profilePic
+          ? onlineUsers.includes(user._id)
             ? 'online avatar-online'
             : 'offline avatar-offline'
           : '',

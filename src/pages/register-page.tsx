@@ -12,9 +12,12 @@ import FormInputText from '../components/shared/form-input-text'
 import ChattyLogo from '../components/shared/chatty-logo-component'
 import { useAuthStore } from '../store/use-auth.store'
 import { handleApiError } from '../lib/utils/handle-api-errors'
+import { useChatStore } from '../store/use-chat.store'
 
 const RegisterPage = () => {
   const { isSigningUp, register } = useAuthStore()
+  const setSelectedUser = useChatStore((state) => state.setSelectedUser)
+
   const [errorText, setErrorText] = useState<string | null>(null)
   const navigate = useNavigate()
 
@@ -25,6 +28,7 @@ const RegisterPage = () => {
 
   async function onSubmit(values: RegisterFormType) {
     try {
+      setSelectedUser(null)
       await register(values)
       toast.success('Welcome to Chatty!')
       navigate('/')

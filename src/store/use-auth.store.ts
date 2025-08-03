@@ -9,6 +9,7 @@ import { LoginFormType } from '../schemas/login.schema'
 import { UpdateProfileFormType } from '../schemas/update-profile.schema'
 import { PROFILE_IMAGE_DELETED } from '../constants/profile-image-delete.constant'
 import { io, Socket } from 'socket.io-client'
+import { AxiosError } from 'axios'
 
 const baseURL: string =
   import.meta.env.MODE === 'development' ? import.meta.env.VITE_SOCKET_URL : '/'
@@ -22,6 +23,7 @@ interface AuthState {
   isCheckingAuth: boolean
   onlineUsers: string[]
   socket: Socket | null
+  userStatus: 'online' | 'offline'
   setAuthUser: (user: AuthUser | null) => void
   checkAuth: (silent?: boolean) => Promise<void>
   setCheckingAuth: (value: boolean) => void
@@ -48,6 +50,7 @@ export const useAuthStore = create<AuthState>()(
       isCheckingAuth: true,
       onlineUsers: [],
       socket: null,
+      userStatus: 'offline',
 
       setAuthUser: (user) => set({ authUser: user }),
       checkAuth: async () => {
@@ -61,6 +64,14 @@ export const useAuthStore = create<AuthState>()(
 
           const res = await api.get<AuthUser>('/auth/me')
           set({ authUser: res.data })
+
+          if (res.data && !get().socket?.connected) {
+            try {
+              await get().connectSocket()
+            } catch (err) {
+              console.warn('Socket connection failed during auth check:', err)
+            }
+          }
         } catch (error) {
           console.log('Error checking auth', error)
           get().clearToken()
@@ -114,17 +125,18 @@ export const useAuthStore = create<AuthState>()(
         set({ isLoggingOut: true })
         try {
           await api.post('/auth/logout')
-          get().clearToken()
-          set({ authUser: null })
-          get().checkAuth()
-        } catch (error) {
-          console.log('Error logging out user', error)
-          throw error
+        } catch (err) {
+          if (err instanceof AxiosError && err.response?.status !== 401) {
+            console.log('Error logging out user', err)
+            throw err
+          }
         } finally {
+          get().disconnectSocket()
+          set({ authUser: null })
+          get().clearToken()
           set({ isLoggingOut: false })
         }
       },
-
       updateProfile: async (data) => {
         set({ isUpdatingProfile: true })
         try {
@@ -176,8 +188,12 @@ export const useAuthStore = create<AuthState>()(
 
         if (existingSocket?.connected) {
           console.log('Socket already connected')
+          existingSocket.emit('request_online_users')
           return
         }
+
+        // Clear stale online users before connecting
+        set({ onlineUsers: [] })
 
         try {
           const socket = io(baseURL, {
@@ -197,24 +213,28 @@ export const useAuthStore = create<AuthState>()(
             socket.on('connect', () => {
               clearTimeout(timeout)
               console.log('Connected to server with socket ID:', socket.id)
-              socket.emit('user_online', authUser._id)
+              set({ userStatus: 'online' })
+
+              // Request current online users immediately after connection
+              socket.emit('request_online_users')
+
               resolve()
             })
 
             socket.on('connect_error', (error) => {
               clearTimeout(timeout)
               console.log('Socket connection error:', error)
+              set({ userStatus: 'offline' })
               reject(error)
             })
           })
 
-          // Set up other event listeners after successful connection
           socket.on('disconnect', (reason) => {
             console.log('Disconnected from server:', reason)
-            set({ onlineUsers: [] })
+            set({ userStatus: 'offline', onlineUsers: [] })
           })
 
-          socket.on('getOnlineUsers', (userIds: string[]) => {
+          socket.on('get_online_users', (userIds: string[]) => {
             console.log('Online users updated:', userIds)
             set({ onlineUsers: userIds })
           })
@@ -222,11 +242,8 @@ export const useAuthStore = create<AuthState>()(
           socket.on(
             'user_status',
             ({ userId, status }: { userId: string; status: 'online' | 'offline' }) => {
-              const currentOnlineUsers = get().onlineUsers
-              if (status === 'online' && !currentOnlineUsers.includes(userId)) {
-                set({ onlineUsers: [...currentOnlineUsers, userId] })
-              } else if (status === 'offline') {
-                set({ onlineUsers: currentOnlineUsers.filter((_id) => _id !== userId) })
+              if (userId === authUser._id) {
+                set({ userStatus: status })
               }
             },
           )
@@ -240,6 +257,7 @@ export const useAuthStore = create<AuthState>()(
             failedSocket.disconnect()
             set({ socket: null })
           }
+          set({ userStatus: 'offline', onlineUsers: [] })
           throw error
         }
       },
@@ -247,8 +265,9 @@ export const useAuthStore = create<AuthState>()(
       disconnectSocket: () => {
         const socket = get().socket
         if (!socket) return
+
         socket.disconnect()
-        set({ socket: null })
+        set({ socket: null, onlineUsers: [], userStatus: 'offline' })
       },
     }),
     {
@@ -260,7 +279,7 @@ export const useAuthStore = create<AuthState>()(
         isLoggingOut: state.isLoggingOut,
         isUpdatingProfile: state.isUpdatingProfile,
         isCheckingAuth: state.isCheckingAuth,
-        onlineUsers: state.onlineUsers,
+        userStatus: state.userStatus,
       }),
     },
   ),
