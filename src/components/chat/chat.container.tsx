@@ -11,10 +11,14 @@ import toast from 'react-hot-toast'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
 
 const ChatContainer = () => {
-  const selectedUser = useChatStore((state) => state.selectedUser)
-  const messages = useChatStore((state) => state.messages)
-  const areMessagesLoading = useChatStore((state) => state.areMessagesLoading)
-  const getMessages = useChatStore((state) => state.getMessages)
+  const {
+    selectedUser,
+    messages,
+    areMessagesLoading,
+    getMessages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore()
 
   const authUser = useAuthStore((state) => state.authUser)
   const messageEndRef = useRef<HTMLInputElement>(null)
@@ -32,7 +36,13 @@ const ChatContainer = () => {
 
   useEffect(() => {
     fetchMessages()
-  }, [fetchMessages])
+
+    subscribeToMessages()
+
+    return () => {
+      unsubscribeFromMessages()
+    }
+  }, [fetchMessages, subscribeToMessages, unsubscribeFromMessages])
 
   useEffect(() => {
     if (messageEndRef.current && messages.length > 0) {
