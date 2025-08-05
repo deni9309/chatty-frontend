@@ -19,6 +19,8 @@ interface ChatState {
   selectedUser: AuthUser | null
   areUsersLoading: boolean
   areMessagesLoading: boolean
+  typingUsers: Set<string> // Users who are currently typing
+  typingTimeout: NodeJS.Timeout | null
 
   setMessages: (messages: Message[]) => void
   setUsers: (users: AuthUser[]) => void
@@ -26,6 +28,12 @@ interface ChatState {
   getUsers: () => Promise<void>
   getMessages: (userId: string) => Promise<void>
   sendMessage: (messageData: MessageData) => Promise<void>
+  setUserTyping: (userId: string, isTyping: boolean) => void
+  startTyping: () => void
+  stopTyping: () => void
+
+  subscribeToTyping: () => void
+  unsubscribeFromTyping: () => void
   subscribeToMessages: () => void
   unsubscribeFromMessages: () => void
 }
@@ -38,6 +46,8 @@ export const useChatStore = create<ChatState>()(
       selectedUser: null,
       areUsersLoading: false,
       areMessagesLoading: false,
+      typingUsers: new Set(),
+      typingTimeout: null,
       setMessages(messages) {
         set({ messages })
       },
@@ -108,6 +118,59 @@ export const useChatStore = create<ChatState>()(
           throw error
         }
       },
+      setUserTyping: (userId, isTyping) => {
+        set((state) => {
+          const newTypingUsers = new Set(state.typingUsers)
+          if (isTyping) {
+            newTypingUsers.add(userId)
+          } else {
+            newTypingUsers.delete(userId)
+          }
+          return { typingUsers: newTypingUsers }
+        })
+      },
+      startTyping: () => {
+        const { selectedUser, typingTimeout } = get()
+        if (!selectedUser) return
+        const socket = useAuthStore.getState().socket
+        if (!socket) return
+
+        if (typingTimeout) clearTimeout(typingTimeout)
+
+        socket.emit('typing', { receiverId: selectedUser._id })
+        const newTimeout = setTimeout(() => {
+          get().stopTyping()
+        }, 3000)
+
+        set({ typingTimeout: newTimeout })
+      },
+      stopTyping: () => {
+        const { selectedUser, typingTimeout } = get()
+        if (!selectedUser) return
+        const socket = useAuthStore.getState().socket
+        if (!socket) return
+
+        if (typingTimeout) {
+          clearTimeout(typingTimeout)
+          set({ typingTimeout: null })
+        }
+
+        socket.emit('stop_typing', { receiverId: selectedUser._id })
+      },
+      subscribeToTyping: () => {
+        const socket = useAuthStore.getState().socket
+        if (!socket) return
+
+        socket.on('user_typing', ({ userId, isTyping }: { userId: string; isTyping: boolean }) => {
+          get().setUserTyping(userId, isTyping)
+        })
+      },
+      unsubscribeFromTyping: () => {
+        const socket = useAuthStore.getState().socket
+        if (!socket) return
+
+        socket.off('user_typing')
+      },
       subscribeToMessages: () => {
         const { selectedUser } = get()
         if (!selectedUser) return
@@ -120,6 +183,8 @@ export const useChatStore = create<ChatState>()(
           if (!isMessageSentFromSelectedUser) return
 
           set({ messages: [...get().messages, newMessage] })
+
+          get().subscribeToTyping()
         })
       },
       unsubscribeFromMessages: () => {
@@ -127,10 +192,23 @@ export const useChatStore = create<ChatState>()(
         if (!socket) return
 
         socket.off('new_message')
+
+        get().unsubscribeFromTyping()
+
+        const { typingTimeout } = get()
+        if (typingTimeout) clearTimeout(typingTimeout)
+        set({ typingUsers: new Set(), typingTimeout: null })
       },
     }),
     {
       name: CHAT_STORAGE,
+      partialize: (state) => ({
+        messages: state.messages,
+        users: state.users,
+        selectedUser: state.selectedUser,
+        areMessagesLoading: state.areMessagesLoading,
+        areUsersLoading: state.areUsersLoading,
+      }),
     },
   ),
 )

@@ -9,6 +9,7 @@ import { useAuthStore } from '../../store/use-auth.store'
 import { formatTimestamp } from '../../lib/utils/date-format.util'
 import toast from 'react-hot-toast'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
+import TypingIndicator from '../shared/typing-indicator'
 
 const ChatContainer = () => {
   const {
@@ -109,6 +110,7 @@ const ChatContainer = () => {
       <div
         className={cn('w-full absolute', window.innerWidth < 900 ? 'bottom-[50px]' : 'bottom-0')}
       >
+        <TypingIndicator />
         <MessageInput />
       </div>
     </div>

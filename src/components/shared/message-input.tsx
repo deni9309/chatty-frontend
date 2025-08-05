@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useRef, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from 'react'
 import { useChatStore } from '../../store/use-chat.store'
 import toast from 'react-hot-toast'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
@@ -9,7 +9,25 @@ const MessageInput = () => {
   const [text, setText] = useState<string>('')
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const { sendMessage } = useChatStore()
+  const { sendMessage, startTyping, stopTyping } = useChatStore()
+
+  useEffect(() => {
+    let typingTimer: NodeJS.Timeout | null = null
+    if (text.trim()) {
+      startTyping()
+      typingTimer = setTimeout(() => {
+        stopTyping()
+      }, 3000)
+    } else {
+      stopTyping()
+    }
+
+    return () => {
+      if (typingTimer) clearTimeout(typingTimer)
+
+      stopTyping()
+    }
+  }, [text, startTyping, stopTyping])
 
   const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] || null
@@ -34,6 +52,8 @@ const MessageInput = () => {
     e.preventDefault()
     try {
       if (text.trim() || fileInputRef.current) {
+        stopTyping()
+
         sendMessage({ text: text.trim(), image: fileInputRef.current?.files?.[0] })
         setText('')
         removeImage()
