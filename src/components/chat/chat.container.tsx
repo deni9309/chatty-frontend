@@ -19,6 +19,8 @@ const ChatContainer = () => {
     getMessages,
     subscribeToMessages,
     unsubscribeFromMessages,
+    subscribeToTyping,
+    unsubscribeFromTyping,
   } = useChatStore()
 
   const authUser = useAuthStore((state) => state.authUser)
@@ -39,11 +41,19 @@ const ChatContainer = () => {
     fetchMessages()
 
     subscribeToMessages()
+    subscribeToTyping()
 
     return () => {
       unsubscribeFromMessages()
+      unsubscribeFromTyping()
     }
-  }, [fetchMessages, subscribeToMessages, unsubscribeFromMessages])
+  }, [
+    fetchMessages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+    subscribeToTyping,
+    unsubscribeFromTyping,
+  ])
 
   useEffect(() => {
     if (messageEndRef.current && messages.length > 0) {
