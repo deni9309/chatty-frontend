@@ -8,9 +8,9 @@ const TypingIndicator = () => {
   return (
     <div className="flex items-center space-x-2 px-4 py-2 text-sm text-neutral-content">
       <div className="flex space-x-1">
-        <div className="status status-neutral animate-bounce" />
-        <div className="status status-neutral animate-bounce" />
-        <div className="status status-neutral animate-bounce" />
+        <div className="size-2 rounded-full bg-neutral animate-bounce" />
+        <div className="size-2 rounded-full bg-neutral animate-bounce delay-75" />
+        <div className="size-2 rounded-full bg-neutral animate-bounce delay-100" />
       </div>
 
       <span>{selectedUser.fullName} is typing...</span>

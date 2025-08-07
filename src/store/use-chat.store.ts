@@ -159,10 +159,14 @@ export const useChatStore = create<ChatState>()(
       },
       subscribeToTyping: () => {
         const socket = useAuthStore.getState().socket
-        if (!socket) return
+        const selectedUser = get().selectedUser
+
+        if (!socket || !selectedUser) return
 
         socket.on('user_typing', ({ userId, isTyping }: { userId: string; isTyping: boolean }) => {
-          get().setUserTyping(userId, isTyping)
+          if (userId === selectedUser._id) {
+            get().setUserTyping(userId, isTyping)
+          }
         })
       },
       unsubscribeFromTyping: () => {
