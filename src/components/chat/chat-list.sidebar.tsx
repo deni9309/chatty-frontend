@@ -90,8 +90,9 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
             >
               <div
                 className={cn(
-                  highlightUnreadMessages(user) &&
-                    'absolute badge badge-primary badge-outline top-2 right-2',
+                  highlightUnreadMessages(user)
+                    ? 'absolute badge badge-primary badge-outline top-2 right-2'
+                    : 'hidden',
                 )}
               >
                 <EnvelopeIcon className="size-5" />
