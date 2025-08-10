@@ -7,27 +7,42 @@ import { cn } from '../../lib/utils/clsx'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
 import ChatListSkeleton from '../skeletons/chat-list-skeleton'
 import UserAvatar from '../shared/user-avatar'
+import { EnvelopeIcon } from '@heroicons/react/24/solid'
 
 interface ChatListSidebarProps {
   handleDrawerOnClick?: () => void
 }
 
 const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
-  const { users, selectedUser, areUsersLoading, getUsers, setSelectedUser } = useChatStore()
+  const {
+    users,
+    selectedUser,
+    areUsersLoading,
+    getUsers,
+    setSelectedUser,
+    unreadMessages,
+    getUnreadMessages,
+  } = useChatStore()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
-
   useEffect(() => {
-    const fetchUsers = async () => {
+    const fetch = async () => {
       try {
         setErrorMessage(null)
         await getUsers()
+        await getUnreadMessages()
       } catch (error) {
         const message = handleApiError(error)
         setErrorMessage(message)
       }
     }
-    fetchUsers()
-  }, [getUsers])
+    fetch()
+  }, [getUsers, getUnreadMessages])
+
+  function highlightUnreadMessages(user: AuthUser) {
+    return unreadMessages.some((message) => message.senderId === user._id)
+  }
+
+  console.log('unreadMessages', unreadMessages)
 
   const handleUserSelect = (user: AuthUser) => {
     if (selectedUser?._id === user._id) {
@@ -67,12 +82,20 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
               key={user._id}
               onClick={() => handleUserSelect(user)}
               className={cn(
-                'p-3 rounded-lg cursor-pointer transition-all duration-200',
+                'p-3 rounded-lg cursor-pointer transition-all duration-200 relative',
                 selectedUser?._id === user._id
                   ? 'bg-primary text-primary-content'
                   : 'hover:bg-base-300 bg-base-100',
               )}
             >
+              <div
+                className={cn(
+                  highlightUnreadMessages(user) &&
+                    'absolute badge badge-primary badge-outline top-2 right-2',
+                )}
+              >
+                <EnvelopeIcon className="size-5" />
+              </div>
               <div className="flex items-center space-x-3">
                 <UserAvatar user={user} onlineIndicator />
 

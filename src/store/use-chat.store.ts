@@ -7,6 +7,7 @@ import { AuthUser } from '../types/authUser'
 import { Message, SingleMessage } from '../types/message'
 import { mapSingleMessageToMessage } from '../lib/utils/type-mappers'
 import { useAuthStore } from './use-auth.store'
+import { UnreadMessage } from '../types/unreadMessage'
 
 interface MessageData {
   text?: string
@@ -15,6 +16,7 @@ interface MessageData {
 
 interface ChatState {
   messages: Message[]
+  unreadMessages: UnreadMessage[]
   users: AuthUser[]
   selectedUser: AuthUser | null
   areUsersLoading: boolean
@@ -23,10 +25,12 @@ interface ChatState {
   typingTimeout: NodeJS.Timeout | null
 
   setMessages: (messages: Message[]) => void
+  setUnreadMessages: (messages: UnreadMessage[]) => void
   setUsers: (users: AuthUser[]) => void
   setSelectedUser: (selectedUser: AuthUser | null) => void
   getUsers: () => Promise<void>
   getMessages: (userId: string) => Promise<void>
+  getUnreadMessages: () => Promise<void>
   sendMessage: (messageData: MessageData) => Promise<void>
   setUserTyping: (userId: string, isTyping: boolean) => void
   startTyping: () => void
@@ -42,6 +46,7 @@ export const useChatStore = create<ChatState>()(
   persist(
     (set, get) => ({
       messages: [],
+      unreadMessages: [],
       users: [],
       selectedUser: null,
       areUsersLoading: false,
@@ -50,6 +55,9 @@ export const useChatStore = create<ChatState>()(
       typingTimeout: null,
       setMessages(messages) {
         set({ messages })
+      },
+      setUnreadMessages(unreadMessages) {
+        set({ unreadMessages })
       },
       setUsers(users) {
         set({ users })
@@ -86,6 +94,22 @@ export const useChatStore = create<ChatState>()(
           set({ messages: res.data })
         } catch (error) {
           console.log('Error getting messages', error)
+          throw error
+        } finally {
+          set({ areMessagesLoading: false })
+        }
+      },
+      getUnreadMessages: async () => {
+        set({ areMessagesLoading: true })
+        try {
+          const authStore = useAuthStore.getState()
+          if (!authStore.authUser) {
+            return
+          }
+          const res = await api.get<UnreadMessage[]>('/messages/unread')
+          set({ unreadMessages: res.data })
+        } catch (error) {
+          console.log('Error getting unread messages', error)
           throw error
         } finally {
           set({ areMessagesLoading: false })
