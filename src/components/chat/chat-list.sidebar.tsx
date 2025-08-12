@@ -39,7 +39,7 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   }, [getUsers, getUnreadMessages])
 
   function highlightUnreadMessages(user: AuthUser) {
-    return unreadMessages.some((message) => message.senderId === user._id)
+    return unreadMessages.filter((message) => message.senderId === user._id)
   }
 
   console.log('unreadMessages', unreadMessages)
@@ -82,22 +82,27 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
               key={user._id}
               onClick={() => handleUserSelect(user)}
               className={cn(
-                'p-3 rounded-lg cursor-pointer transition-all duration-200 relative',
+                'chat-list-user',
                 selectedUser?._id === user._id
-                  ? 'bg-primary text-primary-content'
-                  : 'hover:bg-base-300 bg-base-100',
+                  ? 'chat-list-user__selected'
+                  : 'chat-list-user__default',
               )}
             >
               <div
                 className={cn(
-                  highlightUnreadMessages(user)
-                    ? 'absolute badge badge-primary badge-outline top-2 right-2'
+                  highlightUnreadMessages(user).length > 0
+                    ? 'badge badge-lg badge-ghost'
                     : 'hidden',
                 )}
               >
-                <EnvelopeIcon className="size-5" />
+                <div className="indicator">
+                  <EnvelopeIcon className="size-5" />
+                  <div className="chat-list-user__indicator">
+                    {highlightUnreadMessages(user).length}
+                  </div>
+                </div>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-3 flex-1">
                 <UserAvatar user={user} onlineIndicator />
 
                 {/* User Info */}

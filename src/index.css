@@ -69,10 +69,28 @@
   }
 
   .avatar-online {
-    @apply [_&.online::before]:size-2 [_&.online::before]:bg-green-500
+    @apply [_&.online::before]:size-2 [_&.online::before]:bg-green-500;
   }
 
   .avatar-offline {
-    @apply [_&.offline::before]:size-2 [_&.offline::before]:bg-gray-400
+    @apply [_&.offline::before]:size-2 [_&.offline::before]:bg-gray-400;
+  }
+
+  /* Chat List Sidebar */
+
+  .chat-list-user {
+    @apply p-3 rounded cursor-pointer transition-all justify-between flex flex-row-reverse;
+  }
+
+  .chat-list-user__selected {
+    @apply bg-primary text-primary-content;
+  }
+
+  .chat-list-user__default {
+    @apply hover:bg-base-300 bg-base-100;
+  }
+
+  .chat-list-user__indicator {
+    @apply indicator-item badge badge-sm rounded-full size-full -right-2 animate-pulse;
   }
 }
