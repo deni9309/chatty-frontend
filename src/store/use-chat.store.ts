@@ -26,6 +26,8 @@ interface ChatState {
 
   setMessages: (messages: Message[]) => void
   setUnreadMessages: (messages: UnreadMessage[]) => void
+  markMessagesAsRead: (senderId: string) => Promise<void>
+  findUnreadMessageIds: (messages: Message[]) => string[]
   setUsers: (users: AuthUser[]) => void
   setSelectedUser: (selectedUser: AuthUser | null) => void
   getUsers: () => Promise<void>
@@ -58,6 +60,24 @@ export const useChatStore = create<ChatState>()(
       },
       setUnreadMessages(unreadMessages) {
         set({ unreadMessages })
+      },
+      markMessagesAsRead: async (senderId) => {
+        try {
+          const res = await api.put(`/messages/mark-read/${senderId}`)
+          console.log('Messages marked as read', res.data)
+
+          await get().getUnreadMessages()
+        } catch (error) {
+          console.log('Error marking messages as read', error)
+          throw error
+        }
+      },
+      findUnreadMessageIds: (messages: Message[]) => {
+        const { unreadMessages } = get()
+
+        return unreadMessages
+          .filter((unreadMsg) => messages.some((msg) => msg._id === unreadMsg.messageId))
+          .map((unreadMsg) => unreadMsg.messageId)
       },
       setUsers(users) {
         set({ users })
@@ -232,6 +252,7 @@ export const useChatStore = create<ChatState>()(
       name: CHAT_STORAGE,
       partialize: (state) => ({
         messages: state.messages,
+        unreadMessages: state.unreadMessages,
         users: state.users,
         selectedUser: state.selectedUser,
         areMessagesLoading: state.areMessagesLoading,

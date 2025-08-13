@@ -21,6 +21,8 @@ const ChatContainer = () => {
     unsubscribeFromMessages,
     subscribeToTyping,
     unsubscribeFromTyping,
+    findUnreadMessageIds,
+    markMessagesAsRead,
   } = useChatStore()
 
   const authUser = useAuthStore((state) => state.authUser)
@@ -56,10 +58,24 @@ const ChatContainer = () => {
   ])
 
   useEffect(() => {
-    if (messageEndRef.current && messages.length > 0) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    const unreadMessageIds = findUnreadMessageIds(messages)
+
+    const markRead = async () => {
+      if (selectedUser && unreadMessageIds.length > 0) {
+        const firstUnreadMessageEl = document.querySelector(
+          `[data-message-id="${unreadMessageIds[0]}"]`,
+        )
+
+        firstUnreadMessageEl?.scrollIntoView({ behavior: 'smooth' })
+
+        await markMessagesAsRead(selectedUser._id)
+      } else if (messageEndRef.current && messages.length > 0) {
+        messageEndRef.current.scrollIntoView({ behavior: 'smooth' })
+      }
     }
-  }, [messages])
+
+    markRead()
+  }, [messages, selectedUser, findUnreadMessageIds, markMessagesAsRead])
 
   return (
     <div className="relative h-full flex flex-col flex-1">
@@ -79,8 +95,9 @@ const ChatContainer = () => {
           messages.map((m) => (
             <div
               key={m._id}
+              data-message-id={m._id}
               className={cn('chat', m.senderId === authUser?._id ? 'chat-end' : 'chat-start')}
-              ref={messageEndRef}
+              ref={findUnreadMessageIds(messages).includes(m._id) ? null : messageEndRef}
             >
               <div className="chat-image avatar">
                 <div className="size-10 bg-base-300 rounded-full border">
