@@ -6,10 +6,11 @@ import MessageInput from '../shared/message-input'
 import MessageSkeleton from '../skeletons/message-skeleton'
 import { cn } from '../../lib/utils/clsx'
 import { useAuthStore } from '../../store/use-auth.store'
-import { formatTimestamp } from '../../lib/utils/date-format.util'
 import toast from 'react-hot-toast'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
 import TypingIndicator from '../shared/typing-indicator'
+import { useInView } from 'react-intersection-observer'
+import { formatTimestamp } from '../../lib/utils/date-format.util'
 import { Message } from '../../types/message'
 
 interface ChatMessageProps {
@@ -18,7 +19,6 @@ interface ChatMessageProps {
   authUserProfilePic: string
   selectedUserProfilePic: string
   isUnread: boolean
-  messageEndRef: React.RefObject<HTMLDivElement | null>
 }
 
 const ChatMessage = memo(
@@ -28,7 +28,6 @@ const ChatMessage = memo(
     authUserProfilePic,
     selectedUserProfilePic,
     isUnread,
-    messageEndRef,
   }: ChatMessageProps) => {
     const profilePic = isOwnMessage
       ? authUserProfilePic !== ''
@@ -42,7 +41,6 @@ const ChatMessage = memo(
       <div
         data-message-id={message._id}
         className={cn('chat', isOwnMessage ? 'chat-end' : 'chat-start')}
-        ref={!isUnread ? messageEndRef : null}
       >
         <div className="chat-image avatar">
           <div className="size-10 bg-base-300 rounded-full border">
@@ -56,7 +54,7 @@ const ChatMessage = memo(
         <div className="chat-header mb-1">
           <time className="text-xs opacity-50">{formatTimestamp(message.createdAt)}</time>
         </div>
-        <div className="chat-bubble">
+        <div className={cn('chat-bubble', isUnread && 'chat-bubble-primary')}>
           {message.text !== '' && <p className="mb-1">{message.text}</p>}
           {message.image !== '' && (
             <img
@@ -78,7 +76,10 @@ const ChatContainer = () => {
     selectedUser,
     messages,
     areMessagesLoading,
+    hasMoreMessages,
     getMessages,
+    loadMoreMessages,
+    resetMessages,
     subscribeToMessages,
     unsubscribeFromMessages,
     subscribeToTyping,
@@ -87,18 +88,27 @@ const ChatContainer = () => {
     markMessagesAsRead,
   } = useChatStore()
   const authUser = useAuthStore((state) => state.authUser)
-  const messageEndRef = useRef<HTMLInputElement>(null)
+  const msgEndRef = useRef<HTMLDivElement>(null)
+  const msgContainerRef = useRef<HTMLDivElement>(null)
+
+  // Intersection Observer for infinite scroll
+  const { ref: loadMoreRef, inView } = useInView({
+    threshold: 0,
+    rootMargin: '50px',
+  })
 
   const unreadMessageIds = useMemo(
     () => findUnreadMessageIds(messages),
     [messages, findUnreadMessageIds],
   )
   const isMobile = useMemo(() => window.innerWidth < 900, [])
-  const messageContainerClass = useMemo(
+  const msgContainerClass = useMemo(
     () =>
       cn(
-        'flex-1 overflow-y-auto h-full p-2 space-y-2',
-        isMobile ? 'max-h-[calc(100dvh-270px)]' : 'max-h-[calc(100dvh-220px)]',
+        'flex-1 overflow-y-auto p-2 space-y-2',
+        isMobile
+          ? 'min-h-[calc(100dvh-270px)] max-h-[calc(100dvh-270px)]'
+          : 'min-h-[calc(100dvh-225px)] max-h-[calc(100dvh-225px)]',
       ),
     [isMobile],
   )
@@ -111,12 +121,20 @@ const ChatContainer = () => {
     if (!selectedUser?._id) return
 
     try {
-      await getMessages(selectedUser._id)
+      resetMessages()
+
+      await getMessages(selectedUser._id, 1)
     } catch (error) {
       const msg = handleApiError(error)
       toast.error(msg)
     }
-  }, [selectedUser?._id, getMessages])
+  }, [selectedUser?._id, getMessages, resetMessages])
+
+  useEffect(() => {
+    if (inView && hasMoreMessages && !areMessagesLoading && selectedUser?._id) {
+      loadMoreMessages(selectedUser._id)
+    }
+  }, [inView, hasMoreMessages, areMessagesLoading, selectedUser?._id, loadMoreMessages])
 
   useEffect(() => {
     fetchMessages()
@@ -136,21 +154,37 @@ const ChatContainer = () => {
   ])
 
   useEffect(() => {
+    let timeout1: NodeJS.Timeout
+    let timeout2: NodeJS.Timeout
     const markRead = async () => {
       if (selectedUser && unreadMessageIds.length > 0) {
-        const firstUnreadMessageEl = document.querySelector(
-          `[data-message-id="${unreadMessageIds[0]}"]`,
-        )
-        firstUnreadMessageEl?.scrollIntoView({ behavior: 'smooth' })
+        const firstUnreadMsg = document.querySelector(`[data-message-id="${unreadMessageIds[0]}"]`)
+        timeout1 = setTimeout(() => firstUnreadMsg?.scrollIntoView({ behavior: 'smooth' }), 100)
+
         await markMessagesAsRead(selectedUser._id)
+      } else if (msgEndRef.current && messages.length > 0) {
+        timeout2 = setTimeout(() => msgEndRef.current?.scrollIntoView({ behavior: 'smooth' }), 100)
       }
     }
     markRead()
 
-    if (messageEndRef.current && messages.length > 0 && unreadMessageIds.length === 0) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' })
+    return () => {
+      clearTimeout(timeout1)
+      clearTimeout(timeout2)
     }
-  }, [messages.length, selectedUser, unreadMessageIds, markMessagesAsRead])
+  }, [selectedUser, unreadMessageIds, markMessagesAsRead, messages.length])
+
+  useEffect(() => {
+    if (msgContainerRef.current && messages.length > 20) {
+      const container = msgContainerRef.current
+      const prevHeight = container.scrollHeight
+
+      requestAnimationFrame(() => {
+        const newHeight = container.scrollHeight
+        container.scrollTop = newHeight - prevHeight
+      })
+    }
+  }, [messages.length])
 
   if (!selectedUser || !authUser) return null
 
@@ -158,24 +192,29 @@ const ChatContainer = () => {
     <div className="relative h-full flex flex-col flex-1">
       <ChatHeaderContainer />
 
-      <div className={messageContainerClass}>
+      <div ref={msgContainerRef} className={msgContainerClass}>
+        {hasMoreMessages && messages.length > 0 && (
+          <div ref={loadMoreRef} className="flex justify-center py-2">
+            {areMessagesLoading && <span className="loading loading-spinner loading-sm" />}
+          </div>
+        )}
         {areMessagesLoading ? (
           <MessageSkeleton />
         ) : messages.length === 0 ? (
           <NoChatMessagesContainer />
         ) : (
-          messages.map((message) => (
+          messages.map((message, i) => (
             <ChatMessage
-              key={message._id}
+              key={`${message._id}-${i}`}
               message={message}
               isOwnMessage={message.senderId === authUser._id}
               authUserProfilePic={authUser.profilePic}
               selectedUserProfilePic={selectedUser.profilePic}
               isUnread={unreadMessageIds.includes(message._id)}
-              messageEndRef={messageEndRef}
             />
           ))
         )}
+        <div ref={msgEndRef} />
       </div>
       <div className={bottomContainerClass}>
         <TypingIndicator />

@@ -9,6 +9,16 @@ export type Message = {
   image: string
 }
 
+export type MessagePaginated = {
+  messages: Message[]
+  pagination: {
+    currentPage: number
+    totalPages: number
+    totalCount: number
+    hasMore: boolean
+  }
+}
+
 export type SingleMessage = {
   _id: string
   sender: {
