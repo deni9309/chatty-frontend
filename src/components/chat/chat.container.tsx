@@ -1,12 +1,4 @@
-import {
-  memo,
-  useEffect,
-  useMemo,
-  useRef,
-  forwardRef,
-  useState,
-  useLayoutEffect,
-} from 'react'
+import { memo, useEffect, useMemo, useRef, forwardRef, useState, useLayoutEffect } from 'react'
 import { useChatStore } from '../../store/use-chat.store'
 import NoChatMessagesContainer from './no-chat-messages.container'
 import ChatHeaderContainer from './chat-header.container'
@@ -100,6 +92,7 @@ const ChatContainer = () => {
 
   const [isPaginating, setIsPaginating] = useState(false)
   const [prevScrollHeight, setPrevScrollHeight] = useState<number | null>(null)
+  const hasPerformedInitialScroll = useRef(false)
 
   // Intersection Observer for infinite scroll
   const { ref: loadMoreRef, inView } = useInView({ threshold: 0.1 })
@@ -112,10 +105,15 @@ const ChatContainer = () => {
   // --- EFFECT 1: Handle User Switching (Initial Load & Subscriptions) ---
   useEffect(() => {
     if (!selectedUser?._id) return
-
+    hasPerformedInitialScroll.current = false
     const setupChat = async () => {
       resetMessages()
-      await getMessages(selectedUser._id, 1)
+      try {
+        await getMessages(selectedUser._id, 1)
+      } catch (error) {
+        const msg = handleApiError(error)
+        toast.error(msg)
+      }
     }
 
     setupChat()
@@ -131,20 +129,25 @@ const ChatContainer = () => {
   // --- EFFECT 2: Initial Scroll Logic ---
   // This runs after the initial messages are loaded for a new user.
   useEffect(() => {
-    if (messages.length === 0 || !msgContainerRef.current) return
-
-    const timer = setTimeout(async () => {
-      if (unreadMessageIds.length > 0 && firstUnreadRef.current) {
-        firstUnreadRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
-        if (selectedUser?._id) {
-          await markMessagesAsRead(selectedUser._id)
+    if (messages.length > 0 && !hasPerformedInitialScroll.current && msgContainerRef.current) {
+      const timer = setTimeout(async () => {
+        if (unreadMessageIds.length > 0 && firstUnreadRef.current) {
+          firstUnreadRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' })
+          if (selectedUser?._id) {
+            try {
+              await markMessagesAsRead(selectedUser._id)
+            } catch (error) {
+              const msg = handleApiError(error)
+              toast.error(msg)
+            }
+          }
+        } else {
+          bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
         }
-      } else {
-        bottomRef.current?.scrollIntoView({ behavior: 'auto' })
-      }
-    }, 100)
-
-    return () => clearTimeout(timer)
+        hasPerformedInitialScroll.current = true
+      }, 100)
+      return () => clearTimeout(timer)
+    }
   }, [messages.length > 0 && messages[0]?._id]) // Runs when the first message of a conversation appears
 
   // --- EFFECT 3: Pagination Trigger ---
@@ -176,11 +179,10 @@ const ChatContainer = () => {
   // --- EFFECT 5: Auto-scroll for new incoming messages ---
   // This depends on the total number of messages
   useEffect(() => {
-    if (isPaginating) return 
+    if (isPaginating) return
 
     const container = msgContainerRef.current
     if (container) {
-      // Check if user is near the bottom
       const isNearBottom =
         container.scrollHeight - container.scrollTop - container.clientHeight < 250
       if (isNearBottom) {
