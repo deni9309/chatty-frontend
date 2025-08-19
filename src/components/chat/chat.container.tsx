@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, forwardRef, useState, useLayoutEffect } from 'react'
+import { useEffect, useMemo, useRef, useState, useLayoutEffect } from 'react'
 import { useChatStore } from '../../store/use-chat.store'
 import NoChatMessagesContainer from './no-chat-messages.container'
 import ChatHeaderContainer from './chat-header.container'
@@ -10,63 +10,7 @@ import toast from 'react-hot-toast'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
 import TypingIndicator from '../shared/typing-indicator'
 import { useInView } from 'react-intersection-observer'
-import { formatTimestamp } from '../../lib/utils/date-format.util'
-import { Message } from '../../types/message'
-
-interface ChatMessageProps {
-  message: Message
-  isOwnMessage: boolean
-  authUserProfilePic: string
-  selectedUserProfilePic: string
-  isUnread: boolean
-}
-
-const ChatMessage = memo(
-  forwardRef<HTMLDivElement, ChatMessageProps>(
-    ({ message, isOwnMessage, authUserProfilePic, selectedUserProfilePic, isUnread }, ref) => {
-      const profilePic = isOwnMessage
-        ? authUserProfilePic !== ''
-          ? authUserProfilePic
-          : '/user.svg'
-        : selectedUserProfilePic !== ''
-        ? selectedUserProfilePic
-        : '/user.svg'
-
-      return (
-        <div
-          ref={ref}
-          data-message-id={message._id}
-          className={cn('chat', isOwnMessage ? 'chat-end' : 'chat-start')}
-        >
-          <div className="chat-image avatar">
-            <div className="size-10 bg-base-300 rounded-full border">
-              <img
-                src={profilePic}
-                className="size-full rounded-full p-0.5 object-cover"
-                alt="Profile Image"
-              />
-            </div>
-          </div>
-          <div className="chat-header mb-1">
-            <time className="text-xs opacity-50">{formatTimestamp(message.createdAt)}</time>
-          </div>
-          <div className={cn('chat-bubble', isUnread && 'chat-bubble-primary')}>
-            {message.text !== '' && <p className="mb-1">{message.text}</p>}
-            {message.image !== '' && (
-              <img
-                className="lg:chat-image w-full rounded sm:max-w-sm max-sm:max-w-xs"
-                src={message.image}
-                alt="Attached Image"
-              />
-            )}
-          </div>
-        </div>
-      )
-    },
-  ),
-)
-
-ChatMessage.displayName = 'ChatMessage'
+import ChatMessage from './chat-message'
 
 const ChatContainer = () => {
   const {
@@ -124,6 +68,7 @@ const ChatContainer = () => {
       unsubscribeFromMessages()
       unsubscribeFromTyping()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUser?._id]) // Runs ONLY when the user changes
 
   // --- EFFECT 2: Initial Scroll Logic ---
@@ -148,6 +93,7 @@ const ChatContainer = () => {
       }, 100)
       return () => clearTimeout(timer)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages.length > 0 && messages[0]?._id]) // Runs when the first message of a conversation appears
 
   // --- EFFECT 3: Pagination Trigger ---
