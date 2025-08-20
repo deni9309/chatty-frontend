@@ -8,6 +8,7 @@ import { handleApiError } from '../../lib/utils/handle-api-errors'
 import ChatListSkeleton from '../skeletons/chat-list-skeleton'
 import UserAvatar from '../shared/user-avatar'
 import { EnvelopeIcon } from '@heroicons/react/24/solid'
+import { useAuthStore } from '../../store/use-auth.store'
 
 interface ChatListSidebarProps {
   handleDrawerOnClick?: () => void
@@ -23,7 +24,11 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
     unreadMessages,
     getUnreadMessages,
   } = useChatStore()
+  const onlineUsers = useAuthStore((state) => state.onlineUsers)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const [showOnlineUsersOnly, setShowOnlineUsersOnly] = useState(false)
+
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -41,8 +46,6 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   function highlightUnreadMessages(user: AuthUser) {
     return unreadMessages.filter((message) => message.senderId === user._id)
   }
-
-  console.log('unreadMessages', unreadMessages)
 
   const handleUserSelect = (user: AuthUser) => {
     if (selectedUser?._id === user._id) {
@@ -68,16 +71,32 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
     )
   }
 
+  const filteredUsers = showOnlineUsersOnly
+    ? users.filter((user) => onlineUsers.includes(user._id))
+    : users
+
   return (
     <div className="p-4 flex flex-col items-stretch w-full h-full">
-      <h2 className="text-lg font-semibold mb-4 text-base-content">Chats</h2>
-      {users.length === 0 ? (
+      <div className="flex max-sm:flex-col max-sm:items-start lg:flex-col lg:items-start items-center gap-x-2 mt-2 mb-4">
+        <h2 className="text-lg font-semibold mb-1 text-base-content">My Contacts</h2>
+        <label className="label px-2 cursor-pointer bg-primary/10 rounded-badge">
+          <input
+            type="checkbox"
+            checked={showOnlineUsersOnly}
+            onChange={(e) => setShowOnlineUsersOnly(e.target.checked)}
+            className="checkbox-primary checkbox checkbox-sm me-2"
+          />
+          <span className="label-text leading-tight text-primary w-auto">Show Online</span>
+        </label>
+      </div>
+
+      {filteredUsers.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-base-content/70">No users found</p>
         </div>
       ) : (
         <div className="flex-1 overflow-y-auto space-y-2">
-          {users.map((user) => (
+          {filteredUsers.map((user) => (
             <div
               key={user._id}
               onClick={() => handleUserSelect(user)}
