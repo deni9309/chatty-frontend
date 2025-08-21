@@ -78,16 +78,25 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   return (
     <div className="p-4 flex flex-col items-stretch w-full h-full">
       <div className="flex max-sm:flex-col max-sm:items-start lg:flex-col lg:items-start items-center gap-x-2 mt-2 mb-4">
-        <h2 className="text-lg font-semibold mb-1 text-base-content">My Contacts</h2>
-        <label className="label px-2 cursor-pointer bg-primary/10 rounded-badge">
-          <input
-            type="checkbox"
-            checked={showOnlineUsersOnly}
-            onChange={(e) => setShowOnlineUsersOnly(e.target.checked)}
-            className="checkbox-primary checkbox checkbox-sm me-2"
-          />
-          <span className="label-text leading-tight text-primary w-auto">Show Online</span>
-        </label>
+        <h2 className="text-lg leading-5 xl:text-xl font-semibold mb-1 text-base-content">
+          My contacts
+        </h2>
+        <div className="flex items-center bg-base-300 rounded-badge border border-base-300">
+          <label className="label px-2 cursor-pointer bg-base-100 rounded-badge">
+            <input
+              type="checkbox"
+              checked={showOnlineUsersOnly}
+              onChange={(e) => setShowOnlineUsersOnly(e.target.checked)}
+              className="checkbox-primary checkbox checkbox-sm me-1"
+            />
+            <span className="leading-4 text-primary font-semibold label-text">
+              Show online only
+            </span>
+          </label>
+          <span className="text-xs text-base-content/75 font-semibold px-2 hidden max-md:flex lg:flex">
+            {onlineUsers.length - 1} online
+          </span>
+        </div>
       </div>
 
       {filteredUsers.length === 0 ? (
@@ -121,7 +130,7 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
                   </div>
                 </div>
               </div>
-              <div className="flex items-center space-x-3 flex-1">
+              <div className="flex items-center justify-between space-x-2 w-full">
                 <UserAvatar user={user} onlineIndicator />
 
                 {/* User Info */}
