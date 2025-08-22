@@ -8,6 +8,7 @@ import { Message, MessagePaginated, SingleMessage } from '../types/message'
 import { mapSingleMessageToMessage } from '../lib/utils/type-mappers'
 import { useAuthStore } from './use-auth.store'
 import { UnreadMessage } from '../types/unreadMessage'
+import { MESSAGE_PAGE_NUMBER, MESSAGE_PAGE_SIZE } from '../constants/message.constants'
 
 interface MessageData {
   text?: string
@@ -113,14 +114,14 @@ export const useChatStore = create<ChatState>()(
           set({ areUsersLoading: false })
         }
       },
-      getMessages: async (userId: string, page = 1) => {
+      getMessages: async (userId: string, page = MESSAGE_PAGE_NUMBER) => {
         set({ areMessagesLoading: true })
         try {
           const authStore = useAuthStore.getState()
           if (!authStore.authUser) return
 
           const res = await api.get<MessagePaginated>(
-            `/messages/mine-and/${userId}?page=${page}&limit=20`,
+            `/messages/mine-and/${userId}?page=${page}&limit=${MESSAGE_PAGE_SIZE}`,
           )
 
           set((state) => {
@@ -159,7 +160,7 @@ export const useChatStore = create<ChatState>()(
         }
       },
       resetMessages: () => {
-        set({ messages: [], currentPage: 1, hasMoreMessages: true })
+        set({ messages: [], currentPage: MESSAGE_PAGE_NUMBER, hasMoreMessages: true })
       },
       getUnreadMessages: async () => {
         set({ areMessagesLoading: true })
