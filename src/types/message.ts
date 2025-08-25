@@ -1,3 +1,5 @@
+import { Pagination } from './pagination'
+
 export type Message = {
   _id: string
   senderId: string
@@ -11,12 +13,7 @@ export type Message = {
 
 export type MessagePaginated = {
   messages: Message[]
-  pagination: {
-    currentPage: number
-    totalPages: number
-    totalCount: number
-    hasMore: boolean
-  }
+  pagination: Pagination
 }
 
 export type SingleMessage = {

@@ -1,3 +1,5 @@
+import { Pagination } from './pagination'
+
 export type AuthUser = {
   _id: string
   fullName: string
@@ -6,4 +8,10 @@ export type AuthUser = {
   isDeleted: boolean
   createdAt: Date
   updatedAt: Date
+}
+
+
+export type AuthUserPaginated = {
+  data: AuthUser[]
+  pagination: Pagination
 }

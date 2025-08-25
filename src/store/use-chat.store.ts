@@ -3,12 +3,14 @@ import { persist } from 'zustand/middleware'
 
 import api from '../lib/axios'
 import { CHAT_STORAGE } from '../constants/app-constants'
-import { AuthUser } from '../types/authUser'
+import { AuthUser, AuthUserPaginated } from '../types/authUser'
 import { Message, MessagePaginated, SingleMessage } from '../types/message'
 import { mapSingleMessageToMessage } from '../lib/utils/type-mappers'
 import { useAuthStore } from './use-auth.store'
 import { UnreadMessage } from '../types/unreadMessage'
 import { MESSAGE_PAGE_NUMBER, MESSAGE_PAGE_SIZE } from '../constants/message.constants'
+import { Pagination } from '../types/pagination'
+import { USER_PAGE_SIZE } from '../constants/user.constants'
 
 interface MessageData {
   text?: string
@@ -22,11 +24,20 @@ interface ChatState {
   selectedUser: AuthUser | null
   areUsersLoading: boolean
   areMessagesLoading: boolean
+
+  // Message Pagination
   hasMoreMessages: boolean
   currentPage: number
+
+  // User Pagination
+  userPagination: Pagination
+  userSearchTerm: string
+
+  // Typing State
   typingUsers: Set<string> // Users who are currently typing
   typingTimeout: NodeJS.Timeout | null
 
+  // Actions
   setMessages: (messages: Message[]) => void
   setUnreadMessages: (messages: UnreadMessage[]) => void
   markMessagesAsRead: (senderId: string) => Promise<void>
@@ -34,7 +45,10 @@ interface ChatState {
 
   setUsers: (users: AuthUser[]) => void
   setSelectedUser: (selectedUser: AuthUser | null) => void
-  getUsers: () => Promise<void>
+
+  getUsers: (params: { page: number; search: string }) => Promise<void>
+  searchUsers: (searchTerm: string) => Promise<void>
+  loadMoreUsers: () => Promise<void>
 
   getMessages: (userId: string, page?: number) => Promise<void>
   loadMoreMessages: (userId: string) => Promise<void>
@@ -46,6 +60,7 @@ interface ChatState {
   startTyping: () => void
   stopTyping: () => void
 
+  // Subscriptions
   subscribeToTyping: () => void
   unsubscribeFromTyping: () => void
   subscribeToMessages: () => void
@@ -60,10 +75,20 @@ export const useChatStore = create<ChatState>()(
       users: [],
       selectedUser: null,
       areUsersLoading: false,
-
       areMessagesLoading: false,
+
+      // Message Pagination
       hasMoreMessages: true,
       currentPage: 1,
+
+      // User Pagination
+      userPagination: {
+        currentPage: 1,
+        totalPages: 1,
+        totalCount: 0,
+        hasMore: true,
+      },
+      userSearchTerm: '',
 
       typingUsers: new Set(),
       typingTimeout: null,
@@ -97,22 +122,43 @@ export const useChatStore = create<ChatState>()(
       setSelectedUser(selectedUser) {
         set({ selectedUser })
       },
-      getUsers: async () => {
+      getUsers: async ({ page, search }) => {
         set({ areUsersLoading: true })
         try {
-          const authStore = useAuthStore.getState()
-          if (!authStore.authUser) {
-            return
-          }
+          const authUser = useAuthStore.getState().authUser
+          if (!authUser) return
 
-          const res = await api.get<AuthUser[]>('/messages/users')
-          set({ users: res.data })
+          const res = await api.get<AuthUserPaginated>('/messages/users', {
+            params: {
+              page,
+              search,
+              limit: USER_PAGE_SIZE,
+            },
+          })
+
+          const { data, pagination } = res.data
+
+          set((state) => ({
+            users: page === 1 ? data : [...state.users, ...data],
+            userPagination: pagination,
+          }))
         } catch (error) {
           console.log('Error getting users', error)
           throw error
         } finally {
           set({ areUsersLoading: false })
         }
+      },
+      searchUsers: async (searchTerm) => {
+        set({ userSearchTerm: searchTerm, users: [], selectedUser: null })
+        await get().getUsers({ page: 1, search: searchTerm })
+      },
+      loadMoreUsers: async () => {
+        const { areUsersLoading, userPagination, userSearchTerm } = get()
+        if (areUsersLoading || !userPagination.hasMore) return
+
+        const nextPage = userPagination.currentPage + 1
+        await get().getUsers({ page: nextPage, search: userSearchTerm })
       },
       getMessages: async (userId: string, page = MESSAGE_PAGE_NUMBER) => {
         set({ areMessagesLoading: true })

@@ -9,6 +9,9 @@ import ChatListSkeleton from '../skeletons/chat-list-skeleton'
 import UserAvatar from '../shared/user-avatar'
 import { EnvelopeIcon } from '@heroicons/react/24/solid'
 import { useAuthStore } from '../../store/use-auth.store'
+import { useDebounce } from '../../hooks/use-debounce'
+import toast from 'react-hot-toast'
+import SearchInput from '../shared/search-input'
 
 interface ChatListSidebarProps {
   handleDrawerOnClick?: () => void
@@ -18,9 +21,11 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   const {
     users,
     selectedUser,
-    areUsersLoading,
-    getUsers,
     setSelectedUser,
+    areUsersLoading,
+    searchUsers,
+    loadMoreUsers,
+    userPagination,
     unreadMessages,
     getUnreadMessages,
   } = useChatStore()
@@ -28,20 +33,34 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const [showOnlineUsersOnly, setShowOnlineUsersOnly] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const debouncedSearchTerm = useDebounce(searchTerm, 500)
 
   useEffect(() => {
     const fetch = async () => {
       try {
         setErrorMessage(null)
-        await getUsers()
-        await getUnreadMessages()
+        await searchUsers(debouncedSearchTerm)
       } catch (error) {
         const message = handleApiError(error)
         setErrorMessage(message)
       }
     }
     fetch()
-  }, [getUsers, getUnreadMessages])
+  }, [debouncedSearchTerm, searchUsers])
+
+  useEffect(() => {
+    const fetchUnread = async () => {
+      try {
+        await getUnreadMessages()
+      } catch (error) {
+        const message = handleApiError(error)
+        toast.error(message)
+      }
+    }
+
+    fetchUnread()
+  }, [getUnreadMessages])
 
   function highlightUnreadMessages(user: AuthUser) {
     return unreadMessages.filter((message) => message.senderId === user._id)
@@ -56,7 +75,7 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
     handleDrawerOnClick?.()
   }
 
-  if (areUsersLoading) {
+  if (areUsersLoading && userPagination.currentPage === 1) {
     return <ChatListSkeleton />
   }
 
@@ -77,6 +96,8 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
 
   return (
     <div className="p-4 flex flex-col items-stretch w-full h-full">
+      <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      
       <div className="flex max-sm:flex-col max-sm:items-start lg:flex-col lg:items-start items-center gap-x-2 mt-2 mb-4">
         <h2 className="text-lg leading-5 xl:text-xl font-semibold mb-1 text-base-content">
           My contacts
@@ -132,8 +153,6 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
               </div>
               <div className="flex items-center justify-between space-x-2 w-full">
                 <UserAvatar user={user} onlineIndicator />
-
-                {/* User Info */}
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{user.fullName}</p>
                   <p className="text-sm opacity-70 truncate">{user.email}</p>
@@ -141,6 +160,14 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
               </div>
             </div>
           ))}
+
+          {userPagination.hasMore && (
+            <div className="text-center mt-4">
+              <button className="btn btn-ghost" onClick={loadMoreUsers} disabled={areUsersLoading}>
+                {areUsersLoading ? <span className="loading loading-spinner"></span> : 'Load More'}
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
