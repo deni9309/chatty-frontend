@@ -12,6 +12,7 @@ import { useAuthStore } from '../../store/use-auth.store'
 import { useDebounce } from '../../hooks/use-debounce'
 import toast from 'react-hot-toast'
 import SearchInput from '../shared/search-input'
+import PaginationControls from '../shared/pagination-controls'
 
 interface ChatListSidebarProps {
   handleDrawerOnClick?: () => void
@@ -24,7 +25,7 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
     setSelectedUser,
     areUsersLoading,
     searchUsers,
-    loadMoreUsers,
+    changeUserPage,
     userPagination,
     unreadMessages,
     getUnreadMessages,
@@ -75,10 +76,6 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
     handleDrawerOnClick?.()
   }
 
-  if (areUsersLoading && userPagination.currentPage === 1) {
-    return <ChatListSkeleton />
-  }
-
   if (errorMessage) {
     return (
       <div className="f-center h-full">
@@ -97,7 +94,6 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   return (
     <div className="p-4 flex flex-col items-stretch w-full h-full">
       <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      
       <div className="flex max-sm:flex-col max-sm:items-start lg:flex-col lg:items-start items-center gap-x-2 mt-2 mb-4">
         <h2 className="text-lg leading-5 xl:text-xl font-semibold mb-1 text-base-content">
           My contacts
@@ -120,7 +116,9 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
         </div>
       </div>
 
-      {filteredUsers.length === 0 ? (
+      {areUsersLoading ? (
+        <ChatListSkeleton />
+      ) : filteredUsers.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-base-content/70">No users found</p>
         </div>
@@ -161,13 +159,19 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
             </div>
           ))}
 
-          {userPagination.hasMore && (
+          {/* {userPagination.hasMore && (
             <div className="text-center mt-4">
               <button className="btn btn-ghost" onClick={loadMoreUsers} disabled={areUsersLoading}>
                 {areUsersLoading ? <span className="loading loading-spinner"></span> : 'Load More'}
               </button>
             </div>
-          )}
+          )} */}
+
+          <PaginationControls
+            currentPage={userPagination.currentPage}
+            totalPages={userPagination.totalPages}
+            onPageChange={changeUserPage}
+          />
         </div>
       )}
     </div>

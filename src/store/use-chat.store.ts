@@ -48,7 +48,7 @@ interface ChatState {
 
   getUsers: (params: { page: number; search: string }) => Promise<void>
   searchUsers: (searchTerm: string) => Promise<void>
-  loadMoreUsers: () => Promise<void>
+  changeUserPage: (page: number) => Promise<void>
 
   getMessages: (userId: string, page?: number) => Promise<void>
   loadMoreMessages: (userId: string) => Promise<void>
@@ -138,10 +138,7 @@ export const useChatStore = create<ChatState>()(
 
           const { data, pagination } = res.data
 
-          set((state) => ({
-            users: page === 1 ? data : [...state.users, ...data],
-            userPagination: pagination,
-          }))
+          set({ users: data, userPagination: pagination })
         } catch (error) {
           console.log('Error getting users', error)
           throw error
@@ -150,15 +147,14 @@ export const useChatStore = create<ChatState>()(
         }
       },
       searchUsers: async (searchTerm) => {
-        set({ userSearchTerm: searchTerm, users: [], selectedUser: null })
+        set({ userSearchTerm: searchTerm, selectedUser: null })
         await get().getUsers({ page: 1, search: searchTerm })
       },
-      loadMoreUsers: async () => {
-        const { areUsersLoading, userPagination, userSearchTerm } = get()
-        if (areUsersLoading || !userPagination.hasMore) return
+      changeUserPage: async (page) => {
+        const { areUsersLoading, userSearchTerm } = get()
+        if (areUsersLoading) return
 
-        const nextPage = userPagination.currentPage + 1
-        await get().getUsers({ page: nextPage, search: userSearchTerm })
+        await get().getUsers({ page, search: userSearchTerm })
       },
       getMessages: async (userId: string, page = MESSAGE_PAGE_NUMBER) => {
         set({ areMessagesLoading: true })
