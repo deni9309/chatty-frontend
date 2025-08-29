@@ -11,6 +11,7 @@ import { handleApiError } from '../../lib/utils/handle-api-errors'
 import TypingIndicator from '../shared/typing-indicator'
 import { useInView } from 'react-intersection-observer'
 import ChatMessage from './chat-message'
+import { useWindowSize } from '../../hooks/use-window-size'
 
 const ChatContainer = () => {
   const {
@@ -28,6 +29,7 @@ const ChatContainer = () => {
     findUnreadMessageIds,
     markMessagesAsRead,
   } = useChatStore()
+  const { isMobile } = useWindowSize()
   const authUser = useAuthStore((state) => state.authUser)
 
   const msgContainerRef = useRef<HTMLDivElement>(null)
@@ -71,8 +73,7 @@ const ChatContainer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedUser?._id]) // Runs ONLY when the user changes
 
-  // --- EFFECT 2: Initial Scroll Logic ---
-  // This runs after the initial messages are loaded for a new user.
+  // --- EFFECT 2: Initial Scroll Logic --- runs after the initial messages are loaded for a new user.
   useEffect(() => {
     if (messages.length > 0 && !hasPerformedInitialScroll.current && msgContainerRef.current) {
       const timer = setTimeout(async () => {
@@ -111,8 +112,7 @@ const ChatContainer = () => {
     fetchMore()
   }, [inView, hasMoreMessages, areMessagesLoading, selectedUser?._id, loadMoreMessages])
 
-  // --- EFFECT 4: Preserve Scroll on Pagination ---
-  // useLayoutEffect runs after DOM mutations but before the browser paints.
+  // --- EFFECT 4: Preserve Scroll on Pagination --- useLayoutEffect runs after DOM mutations but before the browser paints.
   useLayoutEffect(() => {
     if (isPaginating && prevScrollHeight !== null && msgContainerRef.current) {
       const container = msgContainerRef.current
@@ -122,8 +122,7 @@ const ChatContainer = () => {
     }
   }, [messages, isPaginating, prevScrollHeight]) // Runs when messages are updated due to pagination
 
-  // --- EFFECT 5: Auto-scroll for new incoming messages ---
-  // This depends on the total number of messages
+  // --- EFFECT 5: Auto-scroll for new incoming messages --- depends on the total number of messages
   useEffect(() => {
     if (isPaginating) return
 
@@ -142,7 +141,6 @@ const ChatContainer = () => {
 
   if (!selectedUser || !authUser) return null
 
-  const isMobile = window.innerWidth < 900
   const msgContainerClass = cn(
     'flex-1 overflow-y-auto p-2 space-y-2',
     isMobile

@@ -1,28 +1,17 @@
 import { Outlet } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ArrowUpIcon } from '@heroicons/react/24/solid'
 import Navbar from '../core/navbar'
 import { usePath } from '../../hooks/use-path.hook'
 import { isChatListVisible } from '../../lib/utils/routes.util'
 import ChatListSidebar from '../chat/chat-list.sidebar'
 import { cn } from '../../lib/utils/clsx'
+import { useWindowSize } from '../../hooks/use-window-size'
 
 const MainLayout: React.FC = () => {
   const { path } = usePath()
-
-  const [windowWidth, setWindowWidth] = useState(window.innerWidth)
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-
-  useEffect(() => {
-    const handleResize = () => {
-      setWindowWidth(window.innerWidth)
-    }
-
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  const isMobile = windowWidth < 900
+  const { isMobile } = useWindowSize()
 
   return (
     <div className="flex flex-col overflow-hidden h-screen w-full">

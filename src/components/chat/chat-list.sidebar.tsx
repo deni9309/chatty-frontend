@@ -13,12 +13,14 @@ import { useDebounce } from '../../hooks/use-debounce'
 import toast from 'react-hot-toast'
 import SearchInput from '../shared/search-input'
 import PaginationControls from '../shared/pagination-controls'
+import { useWindowSize } from '../../hooks/use-window-size'
 
 interface ChatListSidebarProps {
   handleDrawerOnClick?: () => void
 }
 
 const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
+  const { isMobile } = useWindowSize()
   const {
     users,
     selectedUser,
@@ -123,7 +125,7 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
           <p className="text-base-content/70">No users found</p>
         </div>
       ) : (
-        <div className="flex-1 overflow-y-auto space-y-2">
+        <div className={cn("flex-col flex flex-1 justify-between overflow-y-auto", isMobile && 'max-h-[calc(100vh-290px)]')}>
           {filteredUsers.map((user) => (
             <div
               key={user._id}
@@ -158,14 +160,6 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
               </div>
             </div>
           ))}
-
-          {/* {userPagination.hasMore && (
-            <div className="text-center mt-4">
-              <button className="btn btn-ghost" onClick={loadMoreUsers} disabled={areUsersLoading}>
-                {areUsersLoading ? <span className="loading loading-spinner"></span> : 'Load More'}
-              </button>
-            </div>
-          )} */}
 
           <PaginationControls
             currentPage={userPagination.currentPage}

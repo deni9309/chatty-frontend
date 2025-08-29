@@ -6,3 +6,5 @@ export const THEME_STORAGE = 'theme-storage'
 export const DEFAULT_THEME = 'dark'
 
 export const CHAT_STORAGE = 'chat-storage'
+
+export const MOBILE_BREAKPOINT = 900

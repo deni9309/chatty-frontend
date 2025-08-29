@@ -37,7 +37,7 @@ const PaginationControls = ({ currentPage, totalPages, onPageChange }: Paginatio
   const pageNumbers = generatePageNumbers()
 
   return (
-    <div className="flex justify-center mt-4">
+    <div className="flex justify-center mt-3">
       <div className="join">
         <button
           className="join-item btn btn-sm"
