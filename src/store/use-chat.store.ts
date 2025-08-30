@@ -37,6 +37,9 @@ interface ChatState {
   typingUsers: Set<string> // Users who are currently typing
   typingTimeout: NodeJS.Timeout | null
 
+  // Filters
+  onlineOnlyFilter: boolean
+
   // Actions
   setMessages: (messages: Message[]) => void
   setUnreadMessages: (messages: UnreadMessage[]) => void
@@ -60,11 +63,14 @@ interface ChatState {
   startTyping: () => void
   stopTyping: () => void
 
-  // Subscriptions
+  // Subscription Actions
   subscribeToTyping: () => void
   unsubscribeFromTyping: () => void
   subscribeToMessages: () => void
   unsubscribeFromMessages: () => void
+
+  // Filter Actions
+  toggleOnlineOnlyFilter: () => Promise<void>
 }
 
 export const useChatStore = create<ChatState>()(
@@ -90,8 +96,14 @@ export const useChatStore = create<ChatState>()(
       },
       userSearchTerm: '',
 
+      // Typing State
       typingUsers: new Set(),
       typingTimeout: null,
+
+      // Filters
+      onlineOnlyFilter: false,
+
+      // Actions
       setMessages(messages) {
         set({ messages })
       },
@@ -128,11 +140,14 @@ export const useChatStore = create<ChatState>()(
           const authUser = useAuthStore.getState().authUser
           if (!authUser) return
 
+          const { onlineOnlyFilter } = get()
+
           const res = await api.get<AuthUserPaginated>('/messages/users', {
             params: {
               page,
               search,
               limit: USER_PAGE_SIZE,
+              onlineOnly: onlineOnlyFilter,
             },
           })
 
@@ -145,6 +160,13 @@ export const useChatStore = create<ChatState>()(
         } finally {
           set({ areUsersLoading: false })
         }
+      },
+      toggleOnlineOnlyFilter: async () => {
+        // Flip the boolean state and then trigger a new search from page 1
+        const newFilterState = !get().onlineOnlyFilter
+        set({ onlineOnlyFilter: newFilterState })
+
+        await get().searchUsers(get().userSearchTerm)
       },
       searchUsers: async (searchTerm) => {
         set({ userSearchTerm: searchTerm, selectedUser: null })

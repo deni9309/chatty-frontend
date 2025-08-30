@@ -31,11 +31,13 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
     userPagination,
     unreadMessages,
     getUnreadMessages,
+    onlineOnlyFilter,
+    toggleOnlineOnlyFilter,
   } = useChatStore()
   const onlineUsers = useAuthStore((state) => state.onlineUsers)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const [showOnlineUsersOnly, setShowOnlineUsersOnly] = useState(false)
+  //  const [showOnlineUsersOnly, setShowOnlineUsersOnly] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearchTerm = useDebounce(searchTerm, 500)
 
@@ -89,9 +91,9 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
     )
   }
 
-  const filteredUsers = showOnlineUsersOnly
-    ? users.filter((user) => onlineUsers.includes(user._id))
-    : users
+  // const filteredUsers = showOnlineUsersOnly
+  //   ? users.filter((user) => onlineUsers.includes(user._id))
+  //   : users
 
   return (
     <div className="p-4 flex flex-col items-stretch w-full h-full">
@@ -104,8 +106,8 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
           <label className="label px-2 cursor-pointer bg-base-100 rounded-badge">
             <input
               type="checkbox"
-              checked={showOnlineUsersOnly}
-              onChange={(e) => setShowOnlineUsersOnly(e.target.checked)}
+              checked={onlineOnlyFilter}
+              onChange={toggleOnlineOnlyFilter}
               className="checkbox-primary checkbox checkbox-sm me-1"
             />
             <span className="leading-4 text-primary font-semibold label-text">
@@ -120,13 +122,18 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
 
       {areUsersLoading ? (
         <ChatListSkeleton />
-      ) : filteredUsers.length === 0 ? (
+      ) : users.length === 0 ? (
         <div className="flex-1 flex items-center justify-center">
           <p className="text-base-content/70">No users found</p>
         </div>
       ) : (
-        <div className={cn("flex-col flex flex-1 justify-between overflow-y-auto", isMobile && 'max-h-[calc(100vh-290px)]')}>
-          {filteredUsers.map((user) => (
+        <div
+          className={cn(
+            'flex-col flex flex-1 justify-between overflow-y-auto',
+            isMobile && 'max-h-[calc(100vh-290px)]',
+          )}
+        >
+          {users.map((user) => (
             <div
               key={user._id}
               onClick={() => handleUserSelect(user)}
