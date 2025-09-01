@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { TriangleAlert } from 'lucide-react'
+import toast from 'react-hot-toast'
+import { EnvelopeIcon } from '@heroicons/react/24/solid'
 
 import { useChatStore } from '../../store/use-chat.store'
 import { AuthUser } from '../../types/authUser'
@@ -7,10 +9,8 @@ import { cn } from '../../lib/utils/clsx'
 import { handleApiError } from '../../lib/utils/handle-api-errors'
 import ChatListSkeleton from '../skeletons/chat-list-skeleton'
 import UserAvatar from '../shared/user-avatar'
-import { EnvelopeIcon } from '@heroicons/react/24/solid'
 import { useAuthStore } from '../../store/use-auth.store'
 import { useDebounce } from '../../hooks/use-debounce'
-import toast from 'react-hot-toast'
 import SearchInput from '../shared/search-input'
 import PaginationControls from '../shared/pagination-controls'
 import { useWindowSize } from '../../hooks/use-window-size'
@@ -37,22 +37,34 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   const onlineUsers = useAuthStore((state) => state.onlineUsers)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  //  const [showOnlineUsersOnly, setShowOnlineUsersOnly] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const debouncedSearchTerm = useDebounce(searchTerm, 500)
+  const isInitialMount = useRef(true)
 
-  useEffect(() => {
-    const fetch = async () => {
-      try {
-        setErrorMessage(null)
-        await searchUsers(debouncedSearchTerm)
-      } catch (error) {
-        const message = handleApiError(error)
-        setErrorMessage(message)
-      }
+  const fetchUsers = useCallback(async () => {
+    try {
+      setErrorMessage(null)
+      await searchUsers(debouncedSearchTerm)
+    } catch (error) {
+      const message = handleApiError(error)
+      setErrorMessage(message)
     }
-    fetch()
   }, [debouncedSearchTerm, searchUsers])
+
+  // Effect for initial load and searching
+  useEffect(() => {
+    fetchUsers()
+  }, [fetchUsers])
+
+  // Effect for real-time updates when online users change
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false
+      return
+    }
+
+    if (onlineOnlyFilter) fetchUsers()
+  }, [onlineUsers, onlineOnlyFilter, fetchUsers])
 
   useEffect(() => {
     const fetchUnread = async () => {
@@ -91,15 +103,11 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
     )
   }
 
-  // const filteredUsers = showOnlineUsersOnly
-  //   ? users.filter((user) => onlineUsers.includes(user._id))
-  //   : users
-
   return (
     <div className="p-4 flex flex-col items-stretch w-full h-full">
       <SearchInput searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      <div className="flex max-sm:flex-col max-sm:items-start lg:flex-col lg:items-start items-center gap-x-2 mt-2 mb-4">
-        <h2 className="text-lg leading-5 xl:text-xl font-semibold mb-1 text-base-content">
+      <div className="flex max-sm:flex-col max-sm:items-start lg:flex-col lg:items-start items-center gap-x-2 my-2">
+        <h2 className="text-lg leading-5 xl:text-xl font-semibold mb-2 text-base-content">
           My contacts
         </h2>
         <div className="flex items-center bg-base-300 rounded-badge border border-base-300">
@@ -130,44 +138,45 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
         <div
           className={cn(
             'flex-col flex flex-1 justify-between overflow-y-auto',
-            isMobile && 'max-h-[calc(100vh-290px)]',
+            isMobile && 'max-h-[calc(100vh-280px)]',
           )}
         >
-          {users.map((user) => (
-            <div
-              key={user._id}
-              onClick={() => handleUserSelect(user)}
-              className={cn(
-                'chat-list-user',
-                selectedUser?._id === user._id
-                  ? 'chat-list-user__selected'
-                  : 'chat-list-user__default',
-              )}
-            >
+          <div>
+            {users.map((user) => (
               <div
+                key={user._id}
+                onClick={() => handleUserSelect(user)}
                 className={cn(
-                  highlightUnreadMessages(user).length > 0
-                    ? 'badge badge-lg badge-ghost'
-                    : 'hidden',
+                  'chat-list-user',
+                  selectedUser?._id === user._id
+                    ? 'chat-list-user__selected'
+                    : 'chat-list-user__default',
                 )}
               >
-                <div className="indicator">
-                  <EnvelopeIcon className="size-5" />
-                  <div className="chat-list-user__indicator">
-                    {highlightUnreadMessages(user).length}
+                <div
+                  className={cn(
+                    highlightUnreadMessages(user).length > 0
+                      ? 'badge badge-lg badge-ghost'
+                      : 'hidden',
+                  )}
+                >
+                  <div className="indicator">
+                    <EnvelopeIcon className="size-5" />
+                    <div className="chat-list-user__indicator">
+                      {highlightUnreadMessages(user).length}
+                    </div>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between space-x-2 w-full">
+                  <UserAvatar user={user} onlineIndicator />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate">{user.fullName}</p>
+                    <p className="text-sm opacity-70 truncate">{user.email}</p>
                   </div>
                 </div>
               </div>
-              <div className="flex items-center justify-between space-x-2 w-full">
-                <UserAvatar user={user} onlineIndicator />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium truncate">{user.fullName}</p>
-                  <p className="text-sm opacity-70 truncate">{user.email}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-
+            ))}
+          </div>
           <PaginationControls
             currentPage={userPagination.currentPage}
             totalPages={userPagination.totalPages}
