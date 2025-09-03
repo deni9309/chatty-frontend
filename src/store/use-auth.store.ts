@@ -11,8 +11,7 @@ import { PROFILE_IMAGE_DELETED } from '../constants/profile-image-delete.constan
 import { io, Socket } from 'socket.io-client'
 import { AxiosError } from 'axios'
 
-const baseURL: string =
-  import.meta.env.MODE === 'development' ? import.meta.env.VITE_SOCKET_URL : '/'
+const baseURL: string = import.meta.env.VITE_SOCKET_URL
 
 interface AuthState {
   authUser: AuthUser | null
