@@ -3,75 +3,14 @@ import { persist } from 'zustand/middleware'
 
 import api from '../lib/axios'
 import { CHAT_STORAGE } from '../constants/app-constants'
-import { AuthUser, AuthUserPaginated } from '../types/authUser'
+import { AuthUserPaginated } from '../types/authUser'
 import { Message, MessagePaginated, SingleMessage } from '../types/message'
 import { mapSingleMessageToMessage } from '../lib/utils/type-mappers'
 import { useAuthStore } from './use-auth.store'
 import { UnreadMessage } from '../types/unreadMessage'
 import { MESSAGE_PAGE_NUMBER, MESSAGE_PAGE_SIZE } from '../constants/message.constants'
-import { Pagination } from '../types/pagination'
 import { USER_PAGE_SIZE } from '../constants/user.constants'
-
-interface MessageData {
-  text?: string
-  image?: File
-}
-
-interface ChatState {
-  messages: Message[]
-  unreadMessages: UnreadMessage[]
-  users: AuthUser[]
-  selectedUser: AuthUser | null
-  areUsersLoading: boolean
-  areMessagesLoading: boolean
-
-  // Message Pagination
-  hasMoreMessages: boolean
-  currentPage: number
-
-  // User Pagination
-  userPagination: Pagination
-  userSearchTerm: string
-
-  // Typing State
-  typingUsers: Set<string> // Users who are currently typing
-  typingTimeout: NodeJS.Timeout | null
-
-  // Filters
-  onlineOnlyFilter: boolean
-
-  // Actions
-  setMessages: (messages: Message[]) => void
-  setUnreadMessages: (messages: UnreadMessage[]) => void
-  markMessagesAsRead: (senderId: string) => Promise<void>
-  findUnreadMessageIds: (messages: Message[]) => string[]
-
-  setUsers: (users: AuthUser[]) => void
-  setSelectedUser: (selectedUser: AuthUser | null) => void
-
-  getUsers: (params: { page: number; search: string }) => Promise<void>
-  searchUsers: (searchTerm: string) => Promise<void>
-  changeUserPage: (page: number) => Promise<void>
-
-  getMessages: (userId: string, page?: number) => Promise<void>
-  loadMoreMessages: (userId: string) => Promise<void>
-  resetMessages: () => void
-  getUnreadMessages: () => Promise<void>
-  sendMessage: (messageData: MessageData) => Promise<void>
-
-  setUserTyping: (userId: string, isTyping: boolean) => void
-  startTyping: () => void
-  stopTyping: () => void
-
-  // Subscription Actions
-  subscribeToTyping: () => void
-  unsubscribeFromTyping: () => void
-  subscribeToMessages: () => void
-  unsubscribeFromMessages: () => void
-
-  // Filter Actions
-  toggleOnlineOnlyFilter: () => Promise<void>
-}
+import { ChatState } from '../interfaces/use-chat.store.interface'
 
 export const useChatStore = create<ChatState>()(
   persist(
