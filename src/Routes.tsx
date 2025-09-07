@@ -12,6 +12,8 @@ import AuthGuard from './guards/auth-guard'
 import ProfilePage from './pages/profile-page'
 import GuestGuard from './guards/guest-guard'
 
+import GamesPage from './pages/games-page'
+
 const router = createBrowserRouter([
   {
     element: (
@@ -24,7 +26,7 @@ const router = createBrowserRouter([
       { path: '/home', element: <HomePage /> },
       { path: '/profile', element: <ProfilePage /> },
       { path: '/settings', element: <SettingsPage /> },
-      // { path: '/chats/:_id', element: <ChatDetails /> },
+      { path: '/games', element: <GamesPage /> },
     ],
   },
   {
