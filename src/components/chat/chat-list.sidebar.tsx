@@ -14,6 +14,8 @@ import { useDebounce } from '../../hooks/use-debounce'
 import SearchInput from '../shared/search-input'
 import PaginationControls from '../shared/pagination-controls'
 import { useWindowSize } from '../../hooks/use-window-size'
+import { usePath } from '../../hooks/use-path.hook'
+import { useNavigate } from 'react-router-dom'
 
 interface ChatListSidebarProps {
   handleDrawerOnClick?: () => void
@@ -21,6 +23,8 @@ interface ChatListSidebarProps {
 
 const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
   const { isMobile } = useWindowSize()
+  const { path } = usePath()
+  const navigate = useNavigate()
   const {
     users,
     selectedUser,
@@ -90,6 +94,8 @@ const ChatListSidebar = ({ handleDrawerOnClick }: ChatListSidebarProps) => {
       setSelectedUser(user)
     }
     handleDrawerOnClick?.()
+
+    if (path === '/games') navigate('/home')
   }
 
   if (errorMessage) {

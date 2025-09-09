@@ -19,7 +19,12 @@ const MainLayout: React.FC = () => {
       {isChatListVisible(path) ? (
         isMobile ? (
           <>
-            <div className="flex-grow overflow-hidden mb-0">
+            <div
+              className={cn(
+                'flex-grow overflow-y-auto h-full mb-0',
+                path === '/games' && 'max-h-[calc(100vh-128px)]',
+              )}
+            >
               <Outlet />
             </div>
 
@@ -51,17 +56,17 @@ const MainLayout: React.FC = () => {
             </div>
           </>
         ) : (
-          <div className="flex flex-grow">
+          <div className="flex h-full flex-grow">
             <aside className="w-1/4 border-r border-base-300 overflow-y-auto h-[calc(100vh-72px)]">
               <ChatListSidebar />
             </aside>
-            <div className="w-3/4 overflow-hidden">
+            <div className="w-3/4 h-full overflow-y-auto max-h-[calc(100vh-72px)]">
               <Outlet />
             </div>
           </div>
         )
       ) : (
-        <div className="flex-grow overflow-y-auto p-4">
+        <div className="flex h-full flex-grow overflow-y-auto p-4">
           <Outlet />
         </div>
       )}
