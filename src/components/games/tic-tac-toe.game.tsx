@@ -24,7 +24,7 @@ const TicTacToeGame = () => {
   }
 
   return (
-    <div className="flex flex-col items-center w-full max-w-md gap-4 rounded-box bg-base-200/70 p-6 shadow text-base-content">
+    <div className="flex flex-col items-center w-full max-w-md gap-4 rounded-box bg-base-200 p-6 shadow text-base-content">
       <h2 className="text-xl font-bold">Tic-Tac-Toe vs. Computer</h2>
 
       {/* Game Status Display */}
