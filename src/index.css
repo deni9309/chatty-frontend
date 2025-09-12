@@ -22,31 +22,30 @@
   box-sizing: border-box;
 }
 
+/* -- Scrollbar -- */
+
 /* width */
 ::-webkit-scrollbar {
   width: 8px;
 }
-
 /* Track */
 ::-webkit-scrollbar-track {
   background: var(--tw-color-accent, #323232);
-
 }
-
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: var(--tw-color-neutral, #757575);
 }
-
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: var(--tw-color-base, #848484);
 }
 
+/* -- End of Scrollbar -- */
 
+/* -- Glow Overlay -- */
 .glow-overlay {
   --glow-size: 25rem;
-
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -58,6 +57,36 @@
   transition: 400ms mask ease;
   will-change: mask;
 }
+/* -- End of Glow Overlay -- */
+
+/* -- Modals -- */
+.dialog-overlay {
+  transition: all 1s linear !important;
+}
+
+.dialog-overlay[data-state="open"] {
+  opacity: 1;
+}
+
+.dialog-overlay[data-state="closed"] {
+  opacity: 0;
+}
+
+.dialog-content {
+  transition: all 1s ease-in-out !important;
+}
+
+.dialog-content[data-state="open"] {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+}
+
+.dialog-content[data-state="closed"] {
+  opacity: 0;
+  transform: translate(-50%, -50%) scale(0.95);
+}
+
+/* -- End of Modals -- */
 
 @layer utilities {
   .f-center {
@@ -76,8 +105,7 @@
     @apply [_&.offline::before]:size-2 [_&.offline::before]:bg-gray-400;
   }
 
-  /* Chat List Sidebar */
-
+  /* -- Chat List Sidebar -- */
   .chat-list-user {
     @apply p-3 rounded cursor-pointer transition-all justify-between flex flex-row-reverse;
   }
@@ -93,4 +121,6 @@
   .chat-list-user__indicator {
     @apply indicator-item badge badge-sm rounded-full size-full -right-2 animate-pulse;
   }
+
+  /* -- End of Chat List Sidebar -- */
 }

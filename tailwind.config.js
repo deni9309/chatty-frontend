@@ -23,4 +23,10 @@ export default {
       },
     },
   },
+  safelist: [
+    'data-[state=open]:opacity-100',
+    'data-[state=closed]:opacity-0',
+    'data-[state=open]:scale-100',
+    'data-[state=closed]:scale-95',
+  ],
 }
