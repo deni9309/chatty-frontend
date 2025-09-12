@@ -23,6 +23,7 @@ const GamesPage = () => {
               <GameCard
                 title={game.title}
                 description={game.description}
+                thumbnail={game.thumbnail}
                 onClick={() => setOpenGameId(game.id)}
               />
             </Dialog.Trigger>

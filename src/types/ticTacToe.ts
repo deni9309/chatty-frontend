@@ -9,5 +9,6 @@ export type AvailableGames = {
   id: string
   title: string
   description: string
+  thumbnail: string
   component: () => JSX.Element
 }
