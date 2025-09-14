@@ -6,13 +6,20 @@ export const useTicTacToeStore = create<TicTacToeState>((set, get) => ({
   board: initialBoard(),
   currentPlayer: 'X',
   winner: null,
+  winningCombination: null,
   isGameOver: false,
   humanPlayer: 'X', // Human is always 'X'
   computerPlayer: 'O',
   stats: { draws: 0, wins: 0, losses: 0 },
 
   startGame: () => {
-    set({ board: initialBoard(), currentPlayer: 'X', isGameOver: false, winner: null })
+    set({
+      board: initialBoard(),
+      currentPlayer: 'X',
+      isGameOver: false,
+      winner: null,
+      winningCombination: null,
+    })
   },
   resetStats: () => {
     set({ stats: { draws: 0, wins: 0, losses: 0 } })
@@ -28,26 +35,30 @@ export const useTicTacToeStore = create<TicTacToeState>((set, get) => ({
     // Human's move
     const newBoard = [...board]
     newBoard[index] = humanPlayer
-    set({ board: newBoard, currentPlayer: computerPlayer })
 
-    // Check for winner after human move
-    const gameWinner = checkWinner(newBoard)
+    // Check for winner and update state
+    const gameResult = checkWinner(newBoard)
 
-    if (gameWinner) {
+    if (gameResult.winner) {
       set((state) => ({
-        winner: gameWinner,
+        board: newBoard,
+        winner: gameResult.winner,
         isGameOver: true,
+        winningCombination: gameResult.combination,
         stats: {
           ...state.stats,
-          wins: gameWinner === humanPlayer ? state.stats.wins + 1 : state.stats.wins,
-          losses: gameWinner === computerPlayer ? state.stats.losses + 1 : state.stats.losses,
-          draws: gameWinner === 'draw' ? state.stats.draws + 1 : state.stats.draws,
+          wins: gameResult.winner === humanPlayer ? state.stats.wins + 1 : state.stats.wins,
+          losses:
+            gameResult.winner === computerPlayer ? state.stats.losses + 1 : state.stats.losses,
+          draws: gameResult.winner === 'draw' ? state.stats.draws + 1 : state.stats.draws,
         },
       }))
       return // Game over, no computer move needed
     }
 
-    // Trigger computer's move (with a delay for better UX)
+    set({ board: newBoard, currentPlayer: computerPlayer })
+
+    // Computer's move (with a delay for better UX)
     setTimeout(() => {
       const { board: currentBoard, computerPlayer: cp } = get()
 
@@ -64,18 +75,20 @@ export const useTicTacToeStore = create<TicTacToeState>((set, get) => ({
       boardAfterComputerMove[computerMoveIndex] = cp
 
       // Check for winner after computer move
-      const finalWinner = checkWinner(boardAfterComputerMove)
+      const finalResult = checkWinner(boardAfterComputerMove)
       set((state) => ({
         board: boardAfterComputerMove,
-        winner: finalWinner,
-        isGameOver: !!finalWinner, // Coerce null to false, 'X'/'O'/'draw' to true
+        winner: finalResult.winner,
+        isGameOver: !!finalResult.winner, // Coerce null to false, 'X'/'O'/'draw' to true
+        winningCombination: finalResult.combination,
         currentPlayer: humanPlayer,
-        stats: finalWinner
+        stats: finalResult.winner
           ? {
               ...state.stats,
-              wins: finalWinner === humanPlayer ? state.stats.wins + 1 : state.stats.wins,
-              losses: finalWinner === computerPlayer ? state.stats.losses + 1 : state.stats.losses,
-              draws: finalWinner === 'draw' ? state.stats.draws + 1 : state.stats.draws,
+              wins: finalResult.winner === humanPlayer ? state.stats.wins + 1 : state.stats.wins,
+              losses:
+                finalResult.winner === computerPlayer ? state.stats.losses + 1 : state.stats.losses,
+              draws: finalResult.winner === 'draw' ? state.stats.draws + 1 : state.stats.draws,
             }
           : state.stats,
       }))

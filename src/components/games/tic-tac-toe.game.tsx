@@ -1,9 +1,19 @@
+import { cn } from '../../lib/utils/clsx'
+import { getStrikeLineClass } from '../../lib/utils/tic-tac-toe.utils'
 import { useTicTacToeStore } from '../../store/use-tic-tac-toe.store'
 import TicTacToeSquare from '../shared/tic-tac-toe-square'
 
 const TicTacToeGame = () => {
-  const { board, currentPlayer, startGame, makeMove, stats, winner, isGameOver } =
-    useTicTacToeStore()
+  const {
+    board,
+    currentPlayer,
+    startGame,
+    makeMove,
+    stats,
+    winner,
+    isGameOver,
+    winningCombination,
+  } = useTicTacToeStore()
 
   const getStatusMessage = () => {
     if (winner) {
@@ -24,23 +34,37 @@ const TicTacToeGame = () => {
   }
 
   return (
-    <div className="flex flex-col items-center w-full max-w-md gap-4 rounded-box bg-base-200 p-6 shadow text-base-content">
+    <div className="flex flex-col items-center w-full max-w-md gap-4 rounded-box bg-base-100 p-6 shadow text-base-content">
       <h2 className="text-xl font-bold">Tic-Tac-Toe vs. Computer</h2>
 
       {/* Game Status Display */}
       <div className="font-semibold text-center h-8">{getStatusMessage()}</div>
 
       {/* Game Board */}
-      <div className="grid grid-cols-3 bg-primary/10 rounded-box">
-        {board.map((square, index) => (
-          <TicTacToeSquare
-            key={index}
-            value={square}
-            onClick={() => makeMove(index)}
-            // Disable button if game is over, square is filled, or it's computer's turn
-            disabled={isGameOver || !!square || currentPlayer !== 'X'}
+      <div className="grid grid-cols-3 rounded relative overflow-hidden">
+        {board.map((square, index) => {
+          const isWinningSquare = winningCombination?.includes(index) ?? false
+
+          return (
+            <TicTacToeSquare
+              key={index}
+              value={square}
+              onClick={() => makeMove(index)}
+              // Disable button if game is over, square is filled, or it's computer's turn
+              disabled={isGameOver || !!square || currentPlayer !== 'X'}
+              isWinningSquare={isWinningSquare}
+            />
+          )
+        })}
+
+        {isGameOver && winningCombination && (
+          <div
+            className={cn(
+              'absolute rounded-full origin-center transition-all duration-300 bg-accent',
+              getStrikeLineClass(winningCombination),
+            )}
           />
-        ))}
+        )}
       </div>
 
       {/* Game Controls and Stats */}

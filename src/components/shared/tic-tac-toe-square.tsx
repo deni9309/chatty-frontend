@@ -1,26 +1,31 @@
 import { cn } from '../../lib/utils/clsx'
-import { useThemeStore } from '../../store/use-theme.store'
 import { Player } from '../../types/ticTacToe'
 
 interface TicTacToeSquareProps {
   value: Player | null
   onClick: () => void
   disabled: boolean
+  isWinningSquare: boolean
 }
 
-const TicTacToeSquare = ({ value, onClick, disabled }: TicTacToeSquareProps) => {
-  const { theme } = useThemeStore()
-
+const TicTacToeSquare = ({ value, onClick, disabled, isWinningSquare }: TicTacToeSquareProps) => {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'f-center size-20 sm:size-24 border border-base-300 text-5xl font-bold transition-colors disabled:cursor-not-allowed',
-        theme === 'nord' && 'bg-accent',
+        'tic-tac-toe-square',
+        isWinningSquare ? 'bg-accent/10' : 'bg-primary/10 hover:bg-base-200/50',
       )}
     >
-      <span className={cn(value === 'X' ? 'text-primary' : 'text-secondary')}>{value}</span>
+      <span
+        className={cn(
+          value === 'X' ? 'text-primary' : 'text-secondary',
+          isWinningSquare && 'scale-110',
+        )}
+      >
+        {value}
+      </span>
     </button>
   )
 }
