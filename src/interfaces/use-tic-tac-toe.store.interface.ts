@@ -10,6 +10,7 @@ export interface TicTacToeState {
   board: Board
   currentPlayer: Player
   winner: Winner
+  winningCombination: number[] | null
   isGameOver: boolean
   humanPlayer: Player
   computerPlayer: Player
@@ -24,4 +25,9 @@ export interface TicTacToeState {
    */
   makeMove: (index: number) => void
   resetStats: () => void
+}
+
+export interface CheckWinnerResult {
+  winner: Winner
+  combination: number[] | null
 }

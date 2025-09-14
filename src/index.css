@@ -28,14 +28,17 @@
 ::-webkit-scrollbar {
   width: 8px;
 }
+
 /* Track */
 ::-webkit-scrollbar-track {
   background: var(--tw-color-accent, #323232);
 }
+
 /* Handle */
 ::-webkit-scrollbar-thumb {
   background: var(--tw-color-neutral, #757575);
 }
+
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: var(--tw-color-base, #848484);
@@ -57,6 +60,7 @@
   transition: 400ms mask ease;
   will-change: mask;
 }
+
 /* -- End of Glow Overlay -- */
 
 /* -- Modals -- */
@@ -123,4 +127,11 @@
   }
 
   /* -- End of Chat List Sidebar -- */
+
+  /* -- Games -- */
+  .tic-tac-toe-square {
+    @apply f-center m-[0.5px] size-20 sm:size-24 border rounded border-base-300 shadow-primary-content/25 shadow text-5xl font-bold transition-colors disabled:cursor-not-allowed;
+  }
+
+  /* -- End of Games -- */
 }
